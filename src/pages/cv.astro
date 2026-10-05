@@ -17,7 +17,8 @@ import { site, cv, thesis } from "../data/site";
       {site.place}<br />
       <a href={`mailto:${site.email}`}>{site.email}</a> ·
       <a href={site.github}>github.com/georgeotjg</a> ·
-      <a href={site.linkedin}>LinkedIn</a>
+      <a href={site.linkedin}>LinkedIn</a> ·
+      <a href={site.orcid}>ORCID</a>
     </p>
     <p class="cta-row no-print">
       <a class="cta primary" href={site.cvPdf}>Download CV (PDF)</a>
@@ -49,7 +50,7 @@ import { site, cv, thesis } from "../data/site";
           <p>
             <em>Silent failure modes in three-dimensional two-band time-dependent
             Ginzburg–Landau simulations of geometric superconducting diodes</em> —
-            methods paper (19 pp), preprint in preparation, 2026: eighteen failure
+            preprint, Zenodo, 2026, <a href={site.paperDoi}>doi:10.5281/zenodo.23163207</a>: eighteen failure
             modes, each with a test. Currently: the diode at MgB₂-like parameters,
             with Joule heating and interband drag.
           </p>

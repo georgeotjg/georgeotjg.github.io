@@ -44,8 +44,12 @@ import { solver, paper, findings, figuresPaper, weyl, optics, site } from "../da
       </ul>
 
       <h3 style="margin-top:2rem">Methods paper</h3>
-      <p class="paper-title">{paper.title}</p>
-      <p class="meta">{paper.meta} · code: <a href={site.solverRepo}>github.com/georgeotjg/juliaTDGL</a></p>
+      <p class="paper-title"><a href={site.paperDoi}>{paper.title}</a></p>
+      <p class="meta">{paper.meta}</p>
+      <p class="cta-row">
+        <a class="cta primary" href={site.paperDoi}>Read the preprint (Zenodo)</a>
+        <a class="cta" href={site.solverRepo}>Code: juliaTDGL</a>
+      </p>
       {
         findings.map((f) => (
           <section class="finding">

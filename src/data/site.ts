@@ -19,6 +19,8 @@ export const site = {
   cvPdf: "/cv/Jorge_Robles_CV.pdf",
   thesisPdf: "/thesis/Robles_2026_ZnMgFe2O4_thesis.pdf",
   solverRepo: "https://github.com/georgeotjg/juliaTDGL",
+  orcid: "https://orcid.org/0009-0007-0557-0263",
+  paperDoi: "https://doi.org/10.5281/zenodo.23163207",
   updated: "October 2026",
 };
 
@@ -36,7 +38,7 @@ export const numbers = [
 ];
 
 export const now = [
-  "Methods paper on silent failure modes in 3D two-band TDGL simulation: complete, preprint in preparation. The solver is open source (juliaTDGL 1.0).",
+  "Methods paper on silent failure modes in 3D two-band TDGL simulation, published as a preprint on Zenodo (October 2026), with the open-source solver juliaTDGL 1.0.",
   "The geometric diode at MgB₂-like parameters — strong screening and separated coherence lengths — with Joule heating and interband drag; next, multiband and non-equilibrium TDGL for three-dimensional nanostructures.",
   "Nonlinear optics of Weyl semimetals from first principles: a validated real-time model, and a Quantum ESPRESSO → Wannier90 chain under way.",
   "An open computational lensmeter built from a phone camera and a laptop screen (design stage).",
@@ -74,7 +76,7 @@ export const solver = {
 
 export const paper = {
   title: "Silent failure modes in three-dimensional two-band time-dependent Ginzburg–Landau simulations of geometric superconducting diodes",
-  meta: "J. A. Robles-Calderón · methods paper, 19 pp · preprint in preparation (2026)",
+  meta: "J. A. Robles Calderón · Preprint, Zenodo, 2026 · 19 pp · doi:10.5281/zenodo.23163207",
 };
 
 export const findings = [
