@@ -68,6 +68,19 @@ const labels: Record<SceneId, string> = {
     return y < 0 ? -r : r;
   }
 
+  // Small live readout in the top-right corner of a scene.
+  function readout(ctx: CanvasRenderingContext2D, w: number, hero: boolean, text: string) {
+    if (hero && w < 640) return;
+    ctx.save();
+    ctx.font = `${hero ? 11 : 10}px "IBM Plex Mono", monospace`;
+    const tw = ctx.measureText(text).width + 14;
+    ctx.fillStyle = "rgba(11,9,17,0.72)";
+    ctx.fillRect(w - tw - 10, 10, tw, 20);
+    ctx.fillStyle = "rgba(226,222,240,0.9)";
+    ctx.fillText(text, w - tw - 3, 24);
+    ctx.restore();
+  }
+
   const gauss = () => (Math.random() + Math.random() + Math.random() - 1.5) * 2;
 
   // Low-resolution pixel buffer, upscaled with smoothing onto the main canvas.
@@ -393,6 +406,7 @@ const labels: Record<SceneId, string> = {
     let xs = new Float32Array(0), ys = new Float32Array(0);
     let vs: Pt[] = [];
     let pin: Pt | null = null, pinPx: Pt | null = null; // pointer as a pinning site
+    let crossed = 0, clock = 0, rate = 0; // vortices leaving the far edge per unit time
 
     function occupied(x: number, y: number) {
       for (const v of vs) if ((v.x - x) ** 2 + (v.y - y) ** 2 < 2.6) return true;
@@ -426,8 +440,11 @@ const labels: Record<SceneId, string> = {
         v.x += (fx[a] + (Math.random() - 0.5) * 0.6) * dt;
         v.y += (fy[a] + (Math.random() - 0.5) * 0.6) * dt;
         if (v.y < Ly + 0.3 && v.x > -1 && v.x < Lx + 1) keep.push(v);
+        else if (v.y >= Ly + 0.3) crossed++;
       }
       vs = keep;
+      clock += dt;
+      if (clock > 1) { rate = rate ? 0.7 * rate + 0.3 * (crossed / clock) : crossed / clock; crossed = 0; clock = 0; }
     }
 
     function draw(ctx: CanvasRenderingContext2D) {
@@ -461,6 +478,7 @@ const labels: Record<SceneId, string> = {
         ctx.beginPath(); ctx.arc(pinPx.x, pinPx.y, r, 0, 7); ctx.stroke();
         ctx.restore();
       }
+      readout(ctx, f.w, hero, `vortex crossings ≈ ${rate.toFixed(1)} /s  ∝ V`);
     }
 
     function grid() {
@@ -564,6 +582,7 @@ const labels: Record<SceneId, string> = {
       ctx.fillStyle = "rgba(184,178,200,0.6)";
       ctx.fillText("k_z →", 8, h - 10);
       ctx.fillText("k_x ↑", 8, 16);
+      readout(ctx, w, hero, `node separation Δk_z = ${(2 * k0 / Math.PI).toFixed(2)} π/a`);
     }
 
     return {
@@ -698,6 +717,8 @@ const labels: Record<SceneId, string> = {
         ctx.fillText(text, x, ly + 1);
       }
       ctx.restore();
+      const deg = ((((ax * 180) / Math.PI) % 180) + 180) % 180;
+      readout(ctx, w, hero, `cylinder axis ${deg.toFixed(0)}°`);
     }
 
     return {

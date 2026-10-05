@@ -227,8 +227,9 @@ export const cv = {
     { area: "Numerical methods", items: "Finite differences on staggered grids, gauge-invariant discretisation, IMEX schemes, Poisson/elliptic solves, preconditioned Krylov solvers, regression and acceptance testing" },
     { area: "First principles", items: "DFT and DFT+U concepts, band-structure analysis; Quantum ESPRESSO and Octopus (real-time TDDFT), in current use" },
     { area: "Laboratory", items: "Combustion synthesis, XRD with Rietveld refinement, SEM/EDX, UV-Vis diffuse reflectance" },
-    { area: "Data and GIS", items: "Data analysis and fitting pipelines in Python; PostgreSQL/PostGIS, Leaflet, spatial queries; dashboards" },
-    { area: "Web", items: "Next.js, TypeScript, Supabase, PWAs with offline sync" },
+    { area: "Data and cloud", items: "Data analysis and fitting pipelines in Python; SQL (PostgreSQL), Apache Spark, AWS, Metabase dashboards; Podman containers" },
+    { area: "GIS", items: "PostGIS, spatial queries, Leaflet, GPS field data" },
+    { area: "Web", items: "Next.js/TypeScript, Supabase (deployed applications)" },
     { area: "Languages", items: "Spanish (native), English (B2)" },
   ],
 };
