@@ -1,0 +1,116 @@
+---
+import Base from "../layouts/Base.astro";
+import PhysicsScenes from "../components/PhysicsScenes.astro";
+import { solver, paper, findings, figuresPaper, weyl, optics, site } from "../data/site";
+---
+
+<Base
+  title="Research"
+  description="Two-band superconductor simulation with a validated 3D TDGL solver, first-principles nonlinear optics of Weyl semimetals, and low-cost computational optics."
+>
+  <div class="wrap">
+    <p class="kicker">Research</p>
+    <h1>Superconductivity, light and matter</h1>
+    <p class="lede">
+      Simulation of two-band superconductors, the main line since 2025, and two
+      projects started in autumn 2026: first-principles nonlinear optics of Weyl
+      semimetals and an open computational lensmeter.
+    </p>
+    <p class="meta">
+      <a href="#superconductivity">Two-band superconductors</a> ·
+      <a href="#weyl">Nonlinear optics of Weyl semimetals</a> ·
+      <a href="#optics">Computational lensmeter</a>
+    </p>
+
+    <section id="superconductivity">
+      <h2>Two-band superconductors: simulation and validation</h2>
+      <p>{solver.summary}</p>
+      <div class="versions">
+        {
+          solver.versions.map((v) => (
+            <div>
+              <code>{v.tag}</code>
+              <span>{v.what}</span>
+            </div>
+          ))
+        }
+      </div>
+
+      <PhysicsScenes scenes={["vortex"]} />
+
+      <h3 style="margin-top:1.8rem">Validation</h3>
+      <ul class="points">
+        {solver.validation.map((v) => <li>{v}</li>)}
+      </ul>
+
+      <h3 style="margin-top:2rem">Methods paper</h3>
+      <p class="paper-title">{paper.title}</p>
+      <p class="meta">{paper.meta} · code: <a href={site.solverRepo}>github.com/georgeotjg/juliaTDGL</a></p>
+      {
+        findings.map((f) => (
+          <section class="finding">
+            <p class="kicker">{f.kicker}</p>
+            <h3>{f.title}</h3>
+            <ul class="points">
+              {f.points.map((p) => <li>{p}</li>)}
+            </ul>
+          </section>
+        ))
+      }
+
+      <h3 style="margin-top:2.2rem">Figures from the paper</h3>
+      <div class="figs two">
+        {
+          figuresPaper.map((fig) => (
+            <figure>
+              <a href={fig.src} target="_blank" rel="noopener">
+                <img src={fig.src} alt={fig.alt} loading="lazy" />
+              </a>
+              <figcaption>{fig.caption}</figcaption>
+            </figure>
+          ))
+        }
+      </div>
+
+      <h3 style="margin-top:2rem">Currently</h3>
+      <p>
+        The same geometric diode at MgB₂-like parameters — strong screening and
+        well-separated coherence lengths of the two bands — and what Joule
+        heating and interband drag do to it. The longer-term direction is
+        multiband, non-equilibrium TDGL for three-dimensional superconducting
+        nanostructures, a regime that two-dimensional codes cannot reach.
+      </p>
+    </section>
+
+    <section id="weyl">
+      <p class="kicker" style="margin-top:3.2rem">{weyl.status}</p>
+      <h2 style="margin-top:0">Nonlinear optics of Weyl semimetals from first principles</h2>
+      <p>{weyl.summary}</p>
+      <p class="meta">{weyl.stack}</p>
+      <PhysicsScenes scenes={["weyl"]} />
+      <h3 style="margin-top:1.6rem">Completed so far</h3>
+      <ul class="points">
+        {weyl.done.map((d) => <li>{d}</li>)}
+      </ul>
+      <p><strong>Next:</strong> {weyl.next}</p>
+    </section>
+
+    <section id="optics">
+      <p class="kicker" style="margin-top:3.2rem">{optics.status}</p>
+      <h2 style="margin-top:0">{optics.title}</h2>
+      <p>{optics.summary}</p>
+      <PhysicsScenes scenes={["light"]} />
+      <h3 style="margin-top:1.6rem">Completed so far</h3>
+      <ul class="points">
+        {optics.done.map((d) => <li>{d}</li>)}
+      </ul>
+      <p><strong>Next:</strong> {optics.next}</p>
+    </section>
+
+    <p class="callout">
+      The animated panels are computed in the browser from analytic models (and
+      from the measured diffraction data, in the case of the crystal); they
+      illustrate the physics and are not output from the research codes.
+    </p>
+  </div>
+</Base>

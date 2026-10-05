@@ -1,0 +1,106 @@
+---
+import Base from "../layouts/Base.astro";
+import PhysicsScenes from "../components/PhysicsScenes.astro";
+import { site, thesis } from "../data/site";
+---
+
+<Base
+  title="Lab"
+  description="Bachelor's thesis: combustion synthesis of Zn–Mg spinel ferrites, XRD/Rietveld, SEM/EDX and UV-Vis, read against GGA+U band structures."
+>
+  <div class="wrap">
+    <p class="kicker">Experimental materials physics</p>
+    <h1>{thesis.short}</h1>
+    <p class="lede">{thesis.title}.</p>
+    <p class="meta">{thesis.meta}</p>
+    <p>{thesis.note}</p>
+    <p class="cta-row">
+      <a class="cta primary" href={site.thesisPdf}>Thesis PDF (Spanish, 3.5 MB)</a>
+    </p>
+
+    <PhysicsScenes scenes={["crystal"]} />
+
+    <h2>Main results</h2>
+    <ul class="points">
+      {thesis.findings.map((f) => <li>{f}</li>)}
+    </ul>
+    <p class="meta">{thesis.followUp}</p>
+
+    <h2>Synthesis</h2>
+    <div class="figs two tiles">
+      <figure>
+        <a href="/figs/lab_precombustion.jpg" target="_blank" rel="noopener">
+          <img src="/figs/lab_precombustion.jpg" alt="Precursor gel before combustion" loading="lazy" />
+        </a>
+        <figcaption>Precursor gel just before ignition.</figcaption>
+      </figure>
+      <figure>
+        <a href="/figs/lab_postcombustion.jpg" target="_blank" rel="noopener">
+          <img src="/figs/lab_postcombustion.jpg" alt="Expanded solid product after combustion" loading="lazy" />
+        </a>
+        <figcaption>Expanded solid after combustion.</figcaption>
+      </figure>
+    </div>
+
+    <h2>Structure and microstructure</h2>
+    <div class="figs two">
+      <figure>
+        <a href="/figs/lab_rietveld_mixta.jpg" target="_blank" rel="noopener">
+          <img src="/figs/lab_rietveld_mixta.jpg" alt="Rietveld refinement of the mixed Zn–Mg ferrite" loading="lazy" />
+        </a>
+        <figcaption>Rietveld refinement, mixed ferrite (x = 0.5), space group Fd3̄m.</figcaption>
+      </figure>
+      <figure>
+        <a href="/figs/lab_vegard.png" target="_blank" rel="noopener">
+          <img src="/figs/lab_vegard.png" alt="Refined lattice parameter across the series with the Vegard trend" loading="lazy" />
+        </a>
+        <figcaption>Refined lattice parameter across the series, with the Vegard trend (axis labels in Spanish).</figcaption>
+      </figure>
+      <figure>
+        <a href="/figs/lab_sem_zmfo.jpg" target="_blank" rel="noopener">
+          <img src="/figs/lab_sem_zmfo.jpg" alt="SEM micrograph of the mixed ferrite" loading="lazy" />
+        </a>
+        <figcaption>SEM of the mixed ferrite: grain morphology.</figcaption>
+      </figure>
+      <figure>
+        <a href="/figs/lab_vesta_mixta.jpg" target="_blank" rel="noopener">
+          <img src="/figs/lab_vesta_mixta.jpg" alt="Ordered Zn–Mg superstructure drawn in VESTA" loading="lazy" />
+        </a>
+        <figcaption>Ordered Zn–Mg superstructure for x = 0.5 (VESTA).</figcaption>
+      </figure>
+      <figure>
+        <a href="/figs/lab_wh_mixta.png" target="_blank" rel="noopener">
+          <img src="/figs/lab_wh_mixta.png" alt="Williamson–Hall analysis of the mixed ferrite" loading="lazy" />
+        </a>
+        <figcaption>Williamson–Hall, used as a diagnostic; crystallite size is quoted from Scherrer.</figcaption>
+      </figure>
+      <figure>
+        <a href="/figs/lab_edx_zmfo.png" target="_blank" rel="noopener">
+          <img src="/figs/lab_edx_zmfo.png" alt="EDX spectrum of the mixed ferrite" loading="lazy" />
+        </a>
+        <figcaption>EDX of the mixed ferrite.</figcaption>
+      </figure>
+    </div>
+
+    <h2>Optical gap</h2>
+    <div class="figs">
+      <figure>
+        <a href="/figs/lab_tauc_series.png" target="_blank" rel="noopener">
+          <img src="/figs/lab_tauc_series.png" alt="Tauc plots of the three ferrites with linear fits and gap values" loading="lazy" />
+        </a>
+        <figcaption>
+          Diffuse reflectance converted with Kubelka–Munk and plotted for a direct
+          transition; dashed lines are the linear fits whose intercepts give the
+          gaps reported in the thesis. Regenerated for this site from the
+          measured spectra.
+        </figcaption>
+      </figure>
+    </div>
+
+    <p class="meta">
+      The thesis is written in Spanish, and so are some figure labels on this
+      page. The PDF linked above is a compressed copy for the web;
+      the full-resolution file is available on request.
+    </p>
+  </div>
+</Base>

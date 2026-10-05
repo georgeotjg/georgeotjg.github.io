@@ -1,0 +1,140 @@
+---
+import Base from "../layouts/Base.astro";
+import { site, cv, thesis } from "../data/site";
+---
+
+<Base title="CV" description={`CV of ${site.name}: physicist, experimental materials and computational superconductivity.`}>
+  <div class="wrap">
+    <div class="cv-head">
+      <img class="portrait" src={site.photo} alt={`Portrait of ${site.name}`} width="104" height="104" />
+      <div>
+        <p class="kicker">Curriculum vitae</p>
+        <h1>{site.name}</h1>
+      </div>
+    </div>
+    <p class="meta">
+      {site.role}<br />
+      {site.place}<br />
+      <a href={`mailto:${site.email}`}>{site.email}</a> ·
+      <a href={site.github}>github.com/georgeotjg</a> ·
+      <a href={site.linkedin}>LinkedIn</a>
+    </p>
+    <p class="cta-row no-print">
+      <a class="cta primary" href={site.cvPdf}>Download CV (PDF)</a>
+      <button class="cta" type="button" onclick="window.print()">Print this page</button>
+    </p>
+
+    <section class="cv-section">
+      <h2>Summary</h2>
+      <div>
+        <p>{cv.summary}</p>
+        <p class="meta">{cv.seeking}</p>
+      </div>
+    </section>
+
+    <section class="cv-section">
+      <h2>Research</h2>
+      <div>
+        <div class="cv-item">
+          <strong>Three-dimensional two-band TDGL solver</strong>
+          <span>Independent research, Universidad Nacional de Colombia · 2025–present</span>
+          <p>
+            Design, implementation and validation of a 3D two-band time-dependent
+            Ginzburg–Landau solver for mesoscopic superconductors: gauge-invariant
+            link variables, self-consistent vector potential, self-field current
+            injection, Josephson voltmeter. Bit for bit against its Octave
+            reference; ~56 000 test assertions. Open source as
+            <a href={site.solverRepo}>juliaTDGL 1.0</a> (MIT).
+          </p>
+          <p>
+            <em>Silent failure modes in three-dimensional two-band time-dependent
+            Ginzburg–Landau simulations of geometric superconducting diodes</em> —
+            methods paper (19 pp), preprint in preparation, 2026: eighteen failure
+            modes, each with a test. Currently: the diode at MgB₂-like parameters,
+            with Joule heating and interband drag.
+          </p>
+        </div>
+        <div class="cv-item">
+          <strong>{thesis.short}</strong>
+          <span>Bachelor's thesis (trabajo de grado) · advisor D. A. Landínez Téllez · 2026</span>
+          <p>
+            Glycine-assisted combustion synthesis; XRD with Rietveld refinement,
+            SEM/EDX, UV-Vis. Single-phase Fd3̄m solid solution, 20–26 nm coherent
+            domains, direct gap 1.88–1.91 eV. GGA+U band structures (treatment
+            proposed and analysed in the thesis, computed within the research
+            group) place the gap in the Fe–O subsystem.
+          </p>
+        </div>
+        <div class="cv-item">
+          <strong>Nonlinear optics of Weyl semimetals (started 2026)</strong>
+          <p>First-principles photocurrents and second-harmonic generation: Octopus real-time TDDFT and Quantum ESPRESSO + Wannier90 + Julia. Installation validated against the Octopus test suite; real-time lattice model reproducing the quantized circular photogalvanic response; symmetry null test on silicon; GaAs Wannier chain running.</p>
+        </div>
+        <div class="cv-item">
+          <strong>Computational lensmeter (design stage)</strong>
+          <p>Spectacle-lens measurement (sphere, cylinder, axis) by transmission deflectometry with a phone camera's RAW sensor and a laptop screen.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cv-section">
+      <h2>Applied</h2>
+      <div>
+        <div class="cv-item">
+          <strong>Geospatial field-data platform</strong>
+          <p>Next.js, Supabase (PostgreSQL/PostGIS), Leaflet, PWA with an offline queue. Deployed and used in the field.</p>
+        </div>
+        <div class="cv-item">
+          <strong>OCR + local language model</strong>
+          <p>National Astronomical Observatory, UNAL: metadata from scanned documents; malformed extractions rejected.</p>
+        </div>
+        <div class="cv-item">
+          <strong>Commercial catalogue site</strong>
+          <p>Next.js on Vercel, quotes over WhatsApp. <a href={site.catalogue}>{site.catalogue.replace("https://", "")}</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cv-section">
+      <h2>Experience</h2>
+      <div>
+        {
+          cv.experience.map((e) => (
+            <div class="cv-item">
+              <strong>{e.role}</strong>
+              <span>{e.org} · {e.when}</span>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="cv-section">
+      <h2>Education</h2>
+      <div>
+        {
+          cv.education.map((e) => (
+            <div class="cv-item">
+              <strong>{e.what}</strong>
+              <span>{e.where} · {e.when}</span>
+              {e.note && <p>{e.note}</p>}
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="cv-section">
+      <h2>Skills</h2>
+      <div>
+        {
+          cv.skills.map((s) => (
+            <div class="cv-item">
+              <strong>{s.area}</strong>
+              <span>{s.items}</span>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</Base>

@@ -1,0 +1,117 @@
+---
+import Base from "../layouts/Base.astro";
+import PhysicsScenes from "../components/PhysicsScenes.astro";
+import { site, intro, introMore, numbers, now, thesis } from "../data/site";
+---
+
+<Base flush>
+  <section class="hero">
+    <PhysicsScenes variant="hero" scenes={["crystal", "vortex", "weyl", "light"]} />
+    <div class="wrap hero-copy">
+      <div class="hero-id">
+        <img class="portrait" src={site.photo} alt={`Portrait of ${site.name}`} width="104" height="104" />
+        <p class="kicker">Physicist · Universidad Nacional de Colombia</p>
+      </div>
+      <h1>{site.name}</h1>
+      <p class="lede">{intro}</p>
+      <p class="lede lede-more">{introMore}</p>
+      <p class="meta">{site.degree}<br />{site.place}</p>
+      <p class="cta-row">
+        <a class="cta primary" href="/cv">CV</a>
+        <a class="cta" href="/research">Research</a>
+        <a class="cta" href={`mailto:${site.email}`}>Contact</a>
+      </p>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <p class="hero-note">
+      <span data-scene-caption></span>
+      <a href="/research">Research →</a>
+    </p>
+
+    <div class="nums">
+      {
+        numbers.map((n) => (
+          <div>
+            <strong>{n.value}</strong>
+            <span>{n.label}</span>
+          </div>
+        ))
+      }
+    </div>
+
+    <h2>Lines of work</h2>
+    <div class="grid-2">
+      <a class="card" href="/lab">
+        <p class="kicker">Laboratory</p>
+        <h3>{thesis.short}</h3>
+        <p>
+          Combustion synthesis and multi-technique characterization of a Zn–Mg
+          ferrite series, interpreted with GGA+U band structures: why the optical
+          gap barely changes with composition.
+        </p>
+        <span class="more">Thesis and figures →</span>
+      </a>
+      <a class="card" href="/research#superconductivity">
+        <p class="kicker">Superconductivity</p>
+        <h3>Two-band TDGL solver</h3>
+        <p>
+          Superconducting diodes and screening in two-gap samples, with a Julia
+          port verified against its reference, ~50 000 test assertions and 22
+          documented failure modes.
+        </p>
+        <span class="more">Findings →</span>
+      </a>
+      <a class="card" href="/research#weyl">
+        <p class="kicker">Light and matter</p>
+        <h3>Nonlinear and computational optics</h3>
+        <p>
+          Photocurrents in magnetic Weyl semimetals from first principles
+          (Octopus, Quantum ESPRESSO), and an open lensmeter built from a phone
+          camera and a laptop screen. Both at an early stage.
+        </p>
+        <span class="more">Status →</span>
+      </a>
+      <a class="card" href="/software">
+        <p class="kicker">Software and data</p>
+        <h3>Scientific and web applications</h3>
+        <p>
+          Open-source simulation software, a geospatial field-data platform with
+          offline sync, data extraction with OCR and local language models, and
+          production web sites.
+        </p>
+        <span class="more">Projects →</span>
+      </a>
+    </div>
+
+    <h2>Current work</h2>
+    <ul class="now">
+      {now.map((item) => <li>{item}</li>)}
+    </ul>
+
+    <h2>Availability</h2>
+    <p>
+      Open to funded master's or PhD positions in condensed matter physics —
+      superconductivity, functional materials, optics — and to research or
+      industry roles in scientific software, data and materials R&amp;D;
+      remote, hybrid or with relocation. Contact:
+      <a href={`mailto:${site.email}`}>{site.email}</a>.
+    </p>
+
+    <div class="figs two tiles">
+      <figure>
+        <a href="/figs/lab_combustion.jpg" target="_blank" rel="noopener">
+          <img src="/figs/lab_combustion.jpg" alt="Glycine-assisted combustion of the ferrite precursors" loading="lazy" />
+        </a>
+        <figcaption>Glycine-assisted combustion of the Zn–Mg ferrite precursors.</figcaption>
+      </figure>
+      <figure>
+        <a href="/figs/diag_psi_sigma.png" target="_blank" rel="noopener">
+          <img class="contain" src="/figs/diag_psi_sigma.png" alt="Order-parameter density of the sigma band with vortices, from the TDGL solver" loading="lazy" />
+        </a>
+        <figcaption>σ-band order-parameter density with vortices as dark cores, from the TDGL solver.</figcaption>
+      </figure>
+    </div>
+  </div>
+</Base>

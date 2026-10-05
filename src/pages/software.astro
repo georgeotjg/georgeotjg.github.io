@@ -1,0 +1,43 @@
+---
+import Base from "../layouts/Base.astro";
+import { software, practices } from "../data/site";
+---
+
+<Base
+  title="Software"
+  description="Scientific software in Julia, a 3D shape editor, a field data platform, OCR with a local language model, and small production web sites."
+>
+  <div class="wrap">
+    <p class="kicker">Software and data</p>
+    <h1>Scientific and web applications</h1>
+    <p class="lede">
+      Simulation software developed and validated for research, and full-stack
+      web and data applications built for clients and deployed in production.
+    </p>
+
+    <div class="grid-2" style="margin-top:2rem">
+      {
+        software.map((p) => (
+          <article class="card">
+            <p class="kicker">{p.kicker}</p>
+            <h3>{p.title}</h3>
+            <p>{p.body}</p>
+            {p.link && (
+              <p>
+                <a href={p.link}>{p.link.replace("https://", "")}</a>
+              </p>
+            )}
+            <ul class="tags">
+              {p.tags.map((t) => <li>{t}</li>)}
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+
+    <h2>How the scientific code is built</h2>
+    <ul class="points">
+      {practices.map((p) => <li>{p}</li>)}
+    </ul>
+  </div>
+</Base>
