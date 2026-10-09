@@ -6,21 +6,23 @@
 //   vortex   flux flow: vortices driven across a plain strip by a current
 //   weyl     Berry curvature of a two-node Weyl lattice model
 //   light    transmission deflectometry: a dot pattern seen through moving lenses
-type SceneId = "crystal" | "vortex" | "weyl" | "light";
+type SceneId = "crystal" | "vortex" | "weyl" | "light" | "diode";
 interface Props {
   scenes: SceneId[];
   variant?: "hero" | "panel";
+  auto?: boolean;
 }
-const { scenes, variant = "panel" } = Astro.props;
+const { scenes, variant = "panel", auto = variant === "hero" } = Astro.props;
 const labels: Record<SceneId, string> = {
   crystal: "Crystal",
   vortex: "Vortices",
   weyl: "Weyl nodes",
   light: "Light",
+  diode: "Diode",
 };
 ---
 
-<div class={`scenes scenes--${variant}`} data-scenes={scenes.join(",")} data-variant={variant}>
+<div class={`scenes scenes--${variant}`} data-scenes={scenes.join(",")} data-variant={variant} data-auto={String(auto)}>
   <canvas aria-hidden="true"></canvas>
   <div class="scenes-hud">
     {
@@ -52,9 +54,57 @@ const labels: Record<SceneId, string> = {
     coarsen?(): void;
     pointer?(p: Pt | null): void;
     drag?(d: { dx: number; dy: number } | null): void;
+    options?: { label: string; active(): boolean; apply(): void }[];
   };
 
+  // Day and night palettes. Night: violet-black, violet, silver, wine.
+  // Day: warm paper, chocolate ink, wine and bronze. The scenes read T at draw
+  // time, so a theme change only needs a redraw.
+  const PAL = {
+    dark: {
+      bg: [11, 9, 17], inkRGB: "236,232,245", panelRGB: "14,11,20",
+      ringLo: [150, 112, 255], ringHi: [238, 234, 245],
+      poly: { Fe: [224, 172, 112], Zn: [214, 218, 230], Mg: [152, 122, 240] },
+      alpha: { Fe: 0.5, Zn: 0.7, Mg: 0.7 }, oxy: [210, 84, 118],
+      polyEdge: "rgba(240,236,250,0.24)", gloss: "rgba(255,255,255,0.3)",
+      vortA: [104, 74, 196], vortB: [208, 206, 226],
+      weyl: ["rgba(206,90,128,0.62)", "rgba(160,126,255,0.74)", "rgba(234,232,246,0.9)"],
+      weylFade: "rgba(11,9,17,0.085)", weylGlow: "200,180,255", weylAxis: "rgba(184,178,200,0.6)",
+      pixel: [206, 202, 236],
+      sheenA: "rgba(255,255,255,0.10)", sheenB: "rgba(169,139,255,0.07)",
+      lensEdge: "rgba(236,232,250,0.75)", lensInner: "rgba(169,139,255,0.35)",
+      axisLine: "rgba(196,170,255,0.95)", axisText: "rgba(196,180,255,0.95)",
+      diodeA: [150, 112, 255], diodeB: [238, 234, 245],
+    },
+    light: {
+      bg: [235, 226, 214], inkRGB: "58,36,24", panelRGB: "235,226,214",
+      ringLo: [176, 100, 112], ringHi: [96, 44, 54],
+      poly: { Fe: [150, 98, 52], Zn: [168, 164, 156], Mg: [112, 70, 150] },
+      alpha: { Fe: 0.55, Zn: 0.7, Mg: 0.7 }, oxy: [150, 38, 66],
+      polyEdge: "rgba(58,36,24,0.3)", gloss: "rgba(255,255,255,0.5)",
+      vortA: [86, 44, 68], vortB: [190, 136, 78],
+      weyl: ["rgba(150,60,80,0.6)", "rgba(104,70,160,0.66)", "rgba(70,40,28,0.82)"],
+      weylFade: "rgba(235,226,214,0.085)", weylGlow: "122,39,65", weylAxis: "rgba(92,70,60,0.7)",
+      pixel: [78, 46, 34],
+      sheenA: "rgba(255,255,255,0.4)", sheenB: "rgba(122,39,65,0.06)",
+      lensEdge: "rgba(58,36,24,0.8)", lensInner: "rgba(122,39,65,0.3)",
+      axisLine: "rgba(122,39,65,0.95)", axisText: "rgba(122,39,65,0.95)",
+      diodeA: [168, 84, 98], diodeB: [58, 26, 30],
+    },
+  };
+  let T = PAL.dark;
   const BG = [11, 9, 17];
+  const POLY: Record<string, number[]> = { Fe: [0, 0, 0], Zn: [0, 0, 0], Mg: [0, 0, 0] };
+  const ALPHA: Record<string, number> = { Fe: 0, Zn: 0, Mg: 0 };
+  const OXY = [0, 0, 0];
+  function applyTheme() {
+    T = document.documentElement.dataset.theme === "light" ? PAL.light : PAL.dark;
+    for (let i = 0; i < 3; i++) { BG[i] = T.bg[i]; OXY[i] = T.oxy[i]; }
+    for (const k of ["Fe", "Zn", "Mg"]) {
+      POLY[k] = T.poly[k as "Fe"]; ALPHA[k] = T.alpha[k as "Fe"];
+    }
+  }
+  applyTheme();
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // Polynomial atan2, |error| ~ 1e-5 rad: the phase sum is the per-pixel hot loop.
@@ -74,9 +124,9 @@ const labels: Record<SceneId, string> = {
     ctx.save();
     ctx.font = `${hero ? 11 : 10}px "IBM Plex Mono", monospace`;
     const tw = ctx.measureText(text).width + 14;
-    ctx.fillStyle = "rgba(11,9,17,0.72)";
+    ctx.fillStyle = `rgba(${T.panelRGB},0.78)`;
     ctx.fillRect(w - tw - 10, 10, tw, 20);
-    ctx.fillStyle = "rgba(226,222,240,0.9)";
+    ctx.fillStyle = `rgba(${T.inkRGB},0.9)`;
     ctx.fillText(text, w - tw - 3, 24);
     ctx.restore();
   }
@@ -144,11 +194,8 @@ const labels: Record<SceneId, string> = {
     [18.26, "111"], [30.08, "220"], [35.43, "311"], [43.02, "400"],
     [53.44, "422"], [56.95, "511"], [62.51, "440"], [70.97, "620"],
   ];
-  // VESTA-style colours in the site palette: Fe octahedra amber-brown, Zn
-  // tetrahedra silver, Mg tetrahedra violet, oxygen wine.
-  const POLY: Record<string, number[]> = { Fe: [224, 172, 112], Zn: [214, 218, 230], Mg: [152, 122, 240] };
-  const ALPHA: Record<string, number> = { Fe: 0.5, Zn: 0.7, Mg: 0.7 };
-  const OXY = [210, 84, 118];
+  // VESTA-style colours in the site palette (see PAL): Fe octahedra amber-brown,
+  // Zn tetrahedra silver, Mg tetrahedra violet, oxygen wine.
   const CELL_LABEL = [
     "ZnFe₂O₄ · normal spinel, Zn on A sites",
     "Zn₀.₅Mg₀.₅Fe₂O₄ · ordered cell (illustrative)",
@@ -259,13 +306,13 @@ const labels: Record<SceneId, string> = {
       for (let k = 0; k < counts.length; k++) {
         let v = Math.min(1, Math.max(0, counts[k] * norm));
         if (b < 1) v = prevV[k] * (1 - b) + v * b;
-        // Dark → violet → silver as the counts rise.
+        // Background → ringLo → ringHi as the counts rise.
         const s = Math.pow(v, 0.5);
         const hot = Math.max(0, s - 0.5) / 0.5;
         const o = k * 4;
-        d[o] = BG[0] + (150 - BG[0]) * s + 88 * hot;
-        d[o + 1] = BG[1] + (112 - BG[1]) * s + 122 * hot;
-        d[o + 2] = BG[2] + (255 - BG[2]) * s - 10 * hot;
+        d[o] = BG[0] + (T.ringLo[0] - BG[0]) * s + (T.ringHi[0] - T.ringLo[0]) * hot;
+        d[o + 1] = BG[1] + (T.ringLo[1] - BG[1]) * s + (T.ringHi[1] - T.ringLo[1]) * hot;
+        d[o + 2] = BG[2] + (T.ringLo[2] - BG[2]) * s + (T.ringHi[2] - T.ringLo[2]) * hot;
         d[o + 3] = 255;
       }
       f.blit(ctx);
@@ -315,7 +362,7 @@ const labels: Record<SceneId, string> = {
             z: zf,
             draw: () => {
               ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${alpha.toFixed(3)})`;
-              ctx.strokeStyle = "rgba(240,236,250,0.24)";
+              ctx.strokeStyle = T.polyEdge;
               ctx.beginPath(); ctx.moveTo(pa[0], pa[1]); ctx.lineTo(pb[0], pb[1]); ctx.lineTo(pc[0], pc[1]);
               ctx.closePath(); ctx.fill(); ctx.stroke();
             },
@@ -332,7 +379,7 @@ const labels: Record<SceneId, string> = {
           draw: () => {
             ctx.fillStyle = `rgb(${Math.round(OXY[0] * shade)},${Math.round(OXY[1] * shade)},${Math.round(OXY[2] * shade)})`;
             ctx.beginPath(); ctx.arc(x, y, R, 0, 7); ctx.fill();
-            ctx.fillStyle = "rgba(255,255,255,0.3)";
+            ctx.fillStyle = T.gloss;
             ctx.beginPath(); ctx.arc(x - 0.3 * R, y - 0.3 * R, 0.35 * R, 0, 7); ctx.fill();
           },
         });
@@ -348,7 +395,7 @@ const labels: Record<SceneId, string> = {
       if (hero && f.w < 640) return; // the hero text covers the scene on phones
       ctx.save();
       ctx.font = `${hero ? 11 : 10}px "IBM Plex Mono", monospace`;
-      ctx.fillStyle = "rgba(226,222,240,0.7)";
+      ctx.fillStyle = `rgba(${T.inkRGB},0.7)`;
       // Each hkl label sits on its ring, up and to the right, lowered toward
       // the horizontal until it fits inside the frame.
       for (const [p, hkl] of HKL) {
@@ -363,9 +410,9 @@ const labels: Record<SceneId, string> = {
       const line = (text: string, y: number, size: number, alpha: number) => {
         ctx.font = `${size}px "IBM Plex Mono", monospace`;
         const wl = ctx.measureText(text).width + 14;
-        ctx.fillStyle = "rgba(14,11,20,0.78)";
+        ctx.fillStyle = `rgba(${T.panelRGB},0.8)`;
         ctx.fillRect(cx - wl / 2, y - size - 2, wl, size + 8);
-        ctx.fillStyle = `rgba(236,232,245,${alpha})`;
+        ctx.fillStyle = `rgba(${T.inkRGB},${alpha})`;
         ctx.fillText(text, cx, y);
       };
       ctx.textAlign = "center";
@@ -378,7 +425,7 @@ const labels: Record<SceneId, string> = {
       for (const [text, rgb] of legend) {
         ctx.fillStyle = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
         ctx.fillRect(lx, y0 + 33, 9, 9);
-        ctx.fillStyle = "rgba(226,222,240,0.85)";
+        ctx.fillStyle = `rgba(${T.inkRGB},0.85)`;
         ctx.fillText(text, lx + 13, y0 + 42);
         lx += 62;
       }
@@ -476,9 +523,9 @@ const labels: Record<SceneId, string> = {
           }
           const m = 0.5 + 0.5 * Math.cos(phase); // 0 → violet, 1 → silver
           const s = amp * amp, o = (j * gw + i) * 4;
-          d[o] = BG[0] + (104 + 104 * m - BG[0]) * s;
-          d[o + 1] = BG[1] + (74 + 132 * m - BG[1]) * s;
-          d[o + 2] = BG[2] + (196 + 30 * m - BG[2]) * s;
+          d[o] = BG[0] + (T.vortA[0] + (T.vortB[0] - T.vortA[0]) * m - BG[0]) * s;
+          d[o + 1] = BG[1] + (T.vortA[1] + (T.vortB[1] - T.vortA[1]) * m - BG[1]) * s;
+          d[o + 2] = BG[2] + (T.vortA[2] + (T.vortB[2] - T.vortA[2]) * m - BG[2]) * s;
           d[o + 3] = 255;
         }
       }
@@ -487,7 +534,7 @@ const labels: Record<SceneId, string> = {
         const r = (2 * f.h) / Ly;
         ctx.save();
         ctx.setLineDash([4, 4]);
-        ctx.strokeStyle = "rgba(236,232,250,0.55)";
+        ctx.strokeStyle = `rgba(${T.inkRGB},0.55)`;
         ctx.beginPath(); ctx.arc(pinPx.x, pinPx.y, r, 0, 7); ctx.stroke();
         ctx.restore();
       }
@@ -503,7 +550,7 @@ const labels: Record<SceneId, string> = {
 
     return {
       caption:
-        "Vortices driven across a superconducting strip by a transport current (flux flow). Each carries one flux quantum; colour is the phase of the order parameter, winding by 2π around each dark core, and the moving vortices are what a voltmeter reads. The pointer acts as a pinning site that traps passing vortices. Superposed single-vortex profiles with simple overdamped motion — an illustration, not solver output.",
+        "Vortices driven across a superconducting strip by a transport current (flux flow). Each carries one flux quantum; colour is the phase of the order parameter, winding by 2π around each vortex core, and the moving vortices are what a voltmeter reads. The pointer acts as a pinning site that traps passing vortices. Superposed single-vortex profiles with simple overdamped motion — an illustration, not solver output.",
       resize(w, h) {
         f.resize(w, h); grid();
         vs = vs.filter((v) => v.x < Lx + 1);
@@ -547,12 +594,13 @@ const labels: Record<SceneId, string> = {
       P[i * 4 + 3] = 2 + Math.random() * 4;
     }
 
-    const colors = ["rgba(206,90,128,0.62)", "rgba(160,126,255,0.74)", "rgba(234,232,246,0.9)"];
+    let colors = T.weyl;
 
     function step(ctx: CanvasRenderingContext2D, dt: number) {
       k0 += (k0Target - k0) * Math.min(1, dt * 1.5);
       ck0 = Math.cos(k0);
-      ctx.fillStyle = "rgba(11,9,17,0.085)";
+      colors = T.weyl;
+      ctx.fillStyle = T.weylFade;
       ctx.fillRect(0, 0, w, h);
       ctx.lineWidth = hero ? 1.1 : 1;
       const paths = colors.map(() => new Path2D());
@@ -579,20 +627,20 @@ const labels: Record<SceneId, string> = {
         // The trail fade never fully clears, so the glow is drawn faint and small.
         const R = 0.03 * h;
         const g = ctx.createRadialGradient(x, y, 0, x, y, R);
-        g.addColorStop(0, "rgba(200,180,255,0.16)");
-        g.addColorStop(1, "rgba(200,180,255,0)");
+        g.addColorStop(0, `rgba(${T.weylGlow},0.16)`);
+        g.addColorStop(1, `rgba(${T.weylGlow},0)`);
         ctx.fillStyle = g;
         ctx.beginPath(); ctx.arc(x, y, R, 0, 7); ctx.fill();
-        ctx.fillStyle = "rgba(236,232,245,0.95)";
+        ctx.fillStyle = `rgba(${T.inkRGB},0.95)`;
         ctx.beginPath(); ctx.arc(x, y, 2.5, 0, 7); ctx.fill();
         ctx.font = `${hero ? 12 : 11}px "IBM Plex Mono", monospace`;
-        ctx.fillStyle = "rgba(11,9,17,0.85)";
+        ctx.fillStyle = `rgba(${T.panelRGB},0.88)`;
         ctx.fillRect(x + 8, y - 26, 62, 18);
-        ctx.fillStyle = "rgba(236,232,245,0.95)";
+        ctx.fillStyle = `rgba(${T.inkRGB},0.95)`;
         ctx.fillText(label, x + 12, y - 13);
       }
       ctx.font = `11px "IBM Plex Mono", monospace`;
-      ctx.fillStyle = "rgba(184,178,200,0.6)";
+      ctx.fillStyle = T.weylAxis;
       ctx.fillText("k_z →", 8, h - 10);
       ctx.fillText("k_x ↑", 8, 16);
       readout(ctx, w, hero, `node separation Δk_z = ${(2 * k0 / Math.PI).toFixed(2)} π/a`);
@@ -608,7 +656,7 @@ const labels: Record<SceneId, string> = {
         P = new Float32Array(n * 4);
         for (let i = 0; i < n; i++) { spawn(i); P[i * 4 + 2] = Math.random() * P[i * 4 + 3]; }
       },
-      reset(ctx) { ctx.fillStyle = "rgb(11,9,17)"; ctx.fillRect(0, 0, w, h); },
+      reset(ctx) { ctx.fillStyle = `rgb(${BG[0]},${BG[1]},${BG[2]})`; ctx.fillRect(0, 0, w, h); },
       frame(ctx, dt) { step(ctx, dt); },
       settle(ctx) { this.reset(ctx); for (let s = 0; s < 90; s++) step(ctx, 1 / 30); },
       pointer(p) {
@@ -630,7 +678,6 @@ const labels: Record<SceneId, string> = {
     let target: Pt | null = null;
     const lens = { x: 0, y: 0, ang: 0, S: 0.3, C: 0.24, axis: 0.6 };
     const A = 1.2, B = 0.9; // lens semi-axes in units of R
-    const tint = [206, 202, 236];
 
     function place(dt: number) {
       t += dt;
@@ -673,7 +720,7 @@ const labels: Record<SceneId, string> = {
             pu -= Math.floor(pu) + 0.5; pv -= Math.floor(pv) + 0.5;
             const m = Math.max(Math.abs(pu), Math.abs(pv));
             const val = Math.max(0, Math.min(1, (0.3 - m) / 0.08));
-            d[o + c] = BG[c] + val * (tint[c] - BG[c]) * (inside ? 0.85 : 0.6);
+            d[o + c] = BG[c] + val * (T.pixel[c] - BG[c]) * (inside ? 0.85 : 0.6);
           }
           d[o + 3] = 255;
         }
@@ -687,19 +734,19 @@ const labels: Record<SceneId, string> = {
       ctx.save();
       // Rimless lens: a bright bevel and a faint sheen.
       const g = ctx.createLinearGradient(x - A * R, y - B * R, x + A * R, y + B * R);
-      g.addColorStop(0, "rgba(255,255,255,0.10)");
+      g.addColorStop(0, T.sheenA);
       g.addColorStop(0.5, "rgba(255,255,255,0)");
-      g.addColorStop(1, "rgba(169,139,255,0.07)");
+      g.addColorStop(1, T.sheenB);
       ctx.fillStyle = g;
       ctx.beginPath(); ctx.ellipse(x, y, A * R, B * R, ang, 0, 7); ctx.fill();
-      ctx.strokeStyle = "rgba(236,232,250,0.75)";
+      ctx.strokeStyle = T.lensEdge;
       ctx.lineWidth = 1.6;
       ctx.stroke();
-      ctx.strokeStyle = "rgba(169,139,255,0.35)";
+      ctx.strokeStyle = T.lensInner;
       ctx.lineWidth = 4;
       ctx.beginPath(); ctx.ellipse(x, y, A * R - 3, B * R - 3, ang, 0, 7); ctx.stroke();
       // Lensmeter reticle at the optical centre.
-      ctx.strokeStyle = "rgba(236,232,250,0.8)";
+      ctx.strokeStyle = T.lensEdge;
       ctx.lineWidth = 1;
       const rr = 0.22 * R;
       ctx.beginPath(); ctx.arc(x, y, rr, 0, 7); ctx.stroke();
@@ -710,7 +757,7 @@ const labels: Record<SceneId, string> = {
       // Cylinder axis.
       const ax = lens.axis, len = 0.85 * B * R;
       ctx.setLineDash([6, 5]);
-      ctx.strokeStyle = "rgba(196,170,255,0.95)";
+      ctx.strokeStyle = T.axisLine;
       ctx.lineWidth = 1.4;
       ctx.beginPath();
       ctx.moveTo(x - len * Math.cos(ax), y - len * Math.sin(ax));
@@ -720,13 +767,13 @@ const labels: Record<SceneId, string> = {
       if (!(hero && w < 640)) {
         ctx.font = `${hero ? 11 : 10}px "IBM Plex Mono", monospace`;
         ctx.textAlign = "center";
-        ctx.fillStyle = "rgba(196,180,255,0.95)";
+        ctx.fillStyle = T.axisText;
         ctx.fillText("axis", x + (len + 16) * Math.cos(ax), y + (len + 16) * Math.sin(ax) + 4);
         const text = "sphere + cylinder";
         const wl = ctx.measureText(text).width + 12, ly = y + B * R + 22;
-        ctx.fillStyle = "rgba(11,9,17,0.78)";
+        ctx.fillStyle = `rgba(${T.panelRGB},0.82)`;
         ctx.fillRect(x - wl / 2, ly - 12, wl, 18);
-        ctx.fillStyle = "rgba(236,232,245,0.9)";
+        ctx.fillStyle = `rgba(${T.inkRGB},0.9)`;
         ctx.fillText(text, x, ly + 1);
       }
       ctx.restore();
@@ -752,8 +799,145 @@ const labels: Record<SceneId, string> = {
     };
   }
 
+  // ------------------------------------------------------------------ diode
+  // Cartoon of the mechanism of the geometric diode (not solver output): the
+  // same notched strip in a perpendicular field, driven by +J and by −J. The
+  // voltage is carried by single vortices that nucleate at the tip of the notch
+  // and cross the strip — a vortex for one current, an antivortex for the other
+  // (opposite charge and opposite current give the same Lorentz force). The
+  // rectification is the difference in how long the next one waits at the tip.
+  // The wait times below are illustrative; only their asymmetry is the point.
+  function diodeScene(hero: boolean): Scene {
+    const f = makeField(2);
+    const Lx = 26, Ly = 18, nx0 = 11.5, nh = 4, ntop = 1.2, nw = 5; // notch geometry (ξ)
+    const tipX = nx0 + 0.6, tipY = nh + 0.35, SPEED = 5.5;
+    const REGIMES = [
+      { label: "Weak asymmetry", waitPlus: 2.0, waitMinus: 2.4 },
+      { label: "Strong asymmetry", waitPlus: 0.9, waitMinus: 4.6 },
+    ];
+    let regime = 1;
+    type Strip = { s: number; mode: "wait" | "move"; t: number; wait: number; x: number; y: number; n: number; stamps: number[] };
+    const mk = (s: number): Strip => ({ s, mode: "wait", t: Math.random() * 1.5, wait: 1.5, x: tipX, y: tipY, n: 0, stamps: [] });
+    let strips = [mk(1), mk(-1)];
+    let w = 0, h = 0, sc = 10, ox = [0, 0], oy = 0, clock = 0;
+
+    const inNotch = (X: number, Y: number) =>
+      X >= nx0 && X <= nx0 + nw && Y <= nh && (X <= nx0 + ntop || Y < (nh * (nx0 + nw - X)) / (nw - ntop));
+    const waitFor = (st: Strip) => {
+      const base = st.s > 0 ? REGIMES[regime].waitPlus : REGIMES[regime].waitMinus;
+      return base * (0.88 + 0.24 * Math.random());
+    };
+    function rateOf(st: Strip) {
+      const a = st.stamps;
+      if (a.length < 3) return 0;
+      const k = Math.min(4, a.length - 1);
+      return k / (a[a.length - 1] - a[a.length - 1 - k]);
+    }
+    function step(dt: number) {
+      clock += dt;
+      for (const st of strips) {
+        st.t += dt;
+        if (st.mode === "wait") {
+          if (st.t >= st.wait) { st.mode = "move"; st.x = tipX; st.y = tipY; st.t = 0; }
+        } else {
+          st.y += SPEED * dt;
+          st.x += (Math.random() - 0.5) * 0.9 * dt + 0.25 * dt;
+          if (st.y > Ly + 0.4) {
+            st.mode = "wait"; st.t = 0; st.wait = waitFor(st); st.n++;
+            st.stamps.push(clock); if (st.stamps.length > 12) st.stamps.shift();
+          }
+        }
+      }
+    }
+    function resetStrips() {
+      strips = [mk(1), mk(-1)];
+      for (const st of strips) st.wait = waitFor(st);
+      for (let k = 0; k < 1500; k++) step(1 / 30);
+    }
+
+    function draw(ctx: CanvasRenderingContext2D) {
+      const { gw, gh, cell } = f, d = f.img!.data;
+      for (let j = 0; j < gh; j++) {
+        const py = (j + 0.5) * cell, Y = (oy - py) / sc;
+        for (let i = 0; i < gw; i++) {
+          const px = (i + 0.5) * cell, k = px < w / 2 ? 0 : 1, X = (px - ox[k]) / sc, o = (j * gw + i) * 4;
+          let r = BG[0], g = BG[1], b = BG[2];
+          if (X >= 0 && X <= Lx && Y >= 0 && Y <= Ly && !inNotch(X, Y)) {
+            const st = strips[k];
+            let amp = 1, phase = 0.45 * st.s * X;
+            // Order parameter dips near the walls and, as the wait ends, at the tip.
+            const edge = Math.min(X, Lx - X, Y, Ly - Y);
+            amp *= 1 - 0.3 * Math.exp(-edge / 1.3);
+            const stress = st.mode === "wait" ? Math.min(1, st.t / Math.max(st.wait, 0.1)) : 0.25;
+            const tdx = X - tipX, tdy = Y - tipY;
+            amp *= 1 - (0.15 + 0.55 * stress) * Math.exp(-(tdx * tdx + tdy * tdy) / 3.2);
+            if (st.mode === "move") {
+              const dx = X - st.x, dy = Y - st.y, r2 = dx * dx + dy * dy;
+              if (r2 < 25) { const q = 1 - r2 / 25; amp *= 1 - (0.92 / (r2 + 0.9)) * q * q; }
+              phase += st.s * atan2(dy, dx);
+            }
+            const m = 0.5 + 0.5 * Math.cos(phase), a2 = amp * amp;
+            r = BG[0] + (T.vortA[0] + (T.vortB[0] - T.vortA[0]) * m - BG[0]) * a2;
+            g = BG[1] + (T.vortA[1] + (T.vortB[1] - T.vortA[1]) * m - BG[1]) * a2;
+            b = BG[2] + (T.vortA[2] + (T.vortB[2] - T.vortA[2]) * m - BG[2]) * a2;
+          }
+          d[o] = r; d[o + 1] = g; d[o + 2] = b; d[o + 3] = 255;
+        }
+      }
+      f.blit(ctx);
+
+      ctx.save();
+      const fs = 11;
+      ctx.font = `${fs}px "IBM Plex Mono", monospace`;
+      ctx.textAlign = "center";
+      const ink = (a: number) => `rgba(${T.inkRGB},${a})`;
+      strips.forEach((st, k) => {
+        const x0 = ox[k], x1 = ox[k] + Lx * sc, yTop = oy - Ly * sc;
+        // Notch outline.
+        ctx.strokeStyle = T.axisLine; ctx.lineWidth = 1.6; ctx.beginPath();
+        ctx.moveTo(x0 + nx0 * sc, oy); ctx.lineTo(x0 + nx0 * sc, oy - nh * sc);
+        ctx.lineTo(x0 + (nx0 + ntop) * sc, oy - nh * sc); ctx.lineTo(x0 + (nx0 + nw) * sc, oy); ctx.stroke();
+        // Current arrow above the strip.
+        const ya = yTop - 16, dir = st.s;
+        ctx.strokeStyle = ink(0.8); ctx.fillStyle = ink(0.8); ctx.lineWidth = 1.6;
+        const a0 = dir > 0 ? x0 + 0.2 * (x1 - x0) : x1 - 0.2 * (x1 - x0), a1 = dir > 0 ? x1 - 0.2 * (x1 - x0) : x0 + 0.2 * (x1 - x0);
+        ctx.beginPath(); ctx.moveTo(a0, ya); ctx.lineTo(a1, ya); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(a1, ya); ctx.lineTo(a1 - dir * 7, ya - 4); ctx.lineTo(a1 - dir * 7, ya + 4); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = ink(0.95);
+        ctx.fillText(st.s > 0 ? "+J" : "−J", (x0 + x1) / 2, ya - 6);
+        // Counter and measured rate below.
+        const rt = rateOf(st);
+        ctx.fillStyle = ink(0.85);
+        ctx.fillText(`${st.s > 0 ? "vortex" : "antivortex"} crossings: ${st.n}`, (x0 + x1) / 2, oy + 18);
+        ctx.fillStyle = ink(0.6);
+        ctx.fillText((rt ? `rate ${rt.toFixed(2)} /s` : "rate …") + (st.mode === "wait" ? " · waiting at the tip" : " · crossing"), (x0 + x1) / 2, oy + 32);
+      });
+      ctx.restore();
+      const rp = rateOf(strips[0]), rm = rateOf(strips[1]);
+      const nr = rp + rm > 0 ? (rp - rm) / (rp + rm) : 0;
+      readout(ctx, w, hero, rp && rm ? `voltage non-reciprocity ≈ ${(100 * nr).toFixed(0)} %` : "measuring…");
+    }
+
+    return {
+      caption:
+        "The geometric diode in one picture: the same notched strip in a perpendicular field, driven by +J (left) and by −J (right). The voltage is carried by single vortices that nucleate at the tip of the notch and cross the strip, one per period — a vortex for one current, an antivortex for the other. Rectification is the difference in how long the next one waits at the tip, where the order parameter dims as the wait ends. Switch the regime to compare a weak and a strong asymmetry. A cartoon of the mechanism with illustrative parameters, not solver output.",
+      options: REGIMES.map((rg, idx) => ({ label: rg.label, active: () => regime === idx, apply: () => { regime = idx; resetStrips(); } })),
+      resize(nw2, nh2) {
+        w = nw2; h = nh2; f.resize(w, h);
+        sc = Math.max(5, Math.min((w / 2 - 28) / Lx, (h - 124) / Ly));
+        oy = h - 84;
+        ox = [w * 0.25 - (Lx * sc) / 2, w * 0.75 - (Lx * sc) / 2];
+        resetStrips();
+      },
+      reset() { resetStrips(); },
+      frame(ctx, dt) { step(dt); draw(ctx); },
+      settle(ctx) { draw(ctx); },
+      coarsen() { if (f.cell < 6) { f.cell++; f.resize(w, h); } },
+    };
+  }
+
   const factories: Record<string, (hero: boolean) => Scene> = {
-    crystal: crystalScene, vortex: vortexScene, weyl: weylScene, light: lightScene,
+    crystal: crystalScene, vortex: vortexScene, weyl: weylScene, light: lightScene, diode: diodeScene,
   };
 
   function setup(root: HTMLElement) {
@@ -770,10 +954,30 @@ const labels: Record<SceneId, string> = {
     const dpr = Math.min(window.devicePixelRatio || 1, hero ? 1.5 : 2);
 
     let cur = 0, w = 0, h = 0;
-    let running = !reduced, visible = true, auto = ids.length > 1;
+    let running = !reduced, visible = true, auto = ids.length > 1 && root.dataset.auto === "true";
     let lastSwitch = performance.now(), last = 0, cost = 0, raf = 0, switching = false;
 
+    // Per-scene options (e.g. a regime toggle) are rebuilt for the active scene.
+    const optsBox = document.createElement("div");
+    optsBox.className = "scenes-tabs";
+    root.querySelector(".scenes-hud")!.prepend(optsBox);
+    function drawOptions() {
+      optsBox.innerHTML = "";
+      for (const o of scenes[cur].options ?? []) {
+        const b = document.createElement("button");
+        b.type = "button"; b.textContent = o.label;
+        b.setAttribute("aria-pressed", String(o.active()));
+        b.addEventListener("click", () => {
+          o.apply();
+          drawOptions();
+          if (!running) { scenes[cur].settle(ctx); }
+        });
+        optsBox.appendChild(b);
+      }
+    }
+
     function label() {
+      drawOptions();
       tabs.forEach((b, i) => b.setAttribute("aria-pressed", String(i === cur)));
       canvas.style.cursor = scenes[cur].drag ? "grab" : "";
       if (captionEl) captionEl.textContent = scenes[cur].caption;
@@ -869,6 +1073,12 @@ const labels: Record<SceneId, string> = {
     };
     canvas.addEventListener("pointerup", endDrag);
     canvas.addEventListener("pointercancel", endDrag);
+
+    new MutationObserver(() => {
+      applyTheme();
+      scenes[cur].reset(ctx);
+      scenes[cur].settle(ctx);
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
     new ResizeObserver(resize).observe(root);
     new IntersectionObserver((en) => {

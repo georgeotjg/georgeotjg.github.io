@@ -1,9 +1,18 @@
 ---
 import Base from "../layouts/Base.astro";
+import Toc from "../components/Toc.astro";
 import { site, cv, thesis } from "../data/site";
 ---
 
 <Base title="CV" description={`CV of ${site.name}: physicist, experimental materials and computational superconductivity.`}>
+  <Toc items={[
+    { id: "cv-summary", label: "Summary" },
+    { id: "cv-research", label: "Research" },
+    { id: "cv-applied", label: "Applied" },
+    { id: "cv-experience", label: "Experience" },
+    { id: "cv-education", label: "Education" },
+    { id: "cv-skills", label: "Skills" },
+  ]} />
   <div class="wrap">
     <div class="cv-head">
       <img class="portrait" src={site.photo} alt={`Portrait of ${site.name}`} width="104" height="104" />
@@ -25,7 +34,7 @@ import { site, cv, thesis } from "../data/site";
       <button class="cta" type="button" onclick="window.print()">Print this page</button>
     </p>
 
-    <section class="cv-section">
+    <section class="cv-section" id="cv-summary">
       <h2>Summary</h2>
       <div>
         <p>{cv.summary}</p>
@@ -33,7 +42,7 @@ import { site, cv, thesis } from "../data/site";
       </div>
     </section>
 
-    <section class="cv-section">
+    <section class="cv-section" id="cv-research">
       <h2>Research</h2>
       <div>
         <div class="cv-item">
@@ -77,7 +86,7 @@ import { site, cv, thesis } from "../data/site";
       </div>
     </section>
 
-    <section class="cv-section">
+    <section class="cv-section" id="cv-applied">
       <h2>Applied</h2>
       <div>
         <div class="cv-item">
@@ -95,7 +104,7 @@ import { site, cv, thesis } from "../data/site";
       </div>
     </section>
 
-    <section class="cv-section">
+    <section class="cv-section" id="cv-experience">
       <h2>Experience</h2>
       <div>
         {
@@ -109,7 +118,7 @@ import { site, cv, thesis } from "../data/site";
       </div>
     </section>
 
-    <section class="cv-section">
+    <section class="cv-section" id="cv-education">
       <h2>Education</h2>
       <div>
         {
@@ -124,7 +133,7 @@ import { site, cv, thesis } from "../data/site";
       </div>
     </section>
 
-    <section class="cv-section">
+    <section class="cv-section" id="cv-skills">
       <h2>Skills</h2>
       <div>
         {

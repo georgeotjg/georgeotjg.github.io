@@ -24,4 +24,11 @@ const { items } = Astro.props;
   };
   window.addEventListener("scroll", mark, { passive: true });
   mark();
+  // The strip sticks right under the site header, whatever its height.
+  const header = document.querySelector<HTMLElement>(".site-header");
+  const setH = () => {
+    if (header) document.documentElement.style.setProperty("--header-h", `${header.getBoundingClientRect().height}px`);
+  };
+  setH();
+  window.addEventListener("resize", setH);
 </script>
