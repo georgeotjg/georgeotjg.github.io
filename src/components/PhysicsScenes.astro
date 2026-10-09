@@ -62,34 +62,36 @@ const labels: Record<SceneId, string> = {
   // time, so a theme change only needs a redraw.
   const PAL = {
     dark: {
-      bg: [11, 9, 17], inkRGB: "236,232,245", panelRGB: "14,11,20",
-      ringLo: [150, 112, 255], ringHi: [238, 234, 245],
-      poly: { Fe: [224, 172, 112], Zn: [214, 218, 230], Mg: [152, 122, 240] },
+      bg: [11, 9, 17], inkRGB: "226,220,242", panelRGB: "14,11,20",
+      ringLo: [140, 104, 240], ringHi: [226, 160, 190],
+      poly: { Fe: [224, 172, 112], Zn: [196, 200, 222], Mg: [152, 122, 240] },
       alpha: { Fe: 0.5, Zn: 0.7, Mg: 0.7 }, oxy: [210, 84, 118],
-      polyEdge: "rgba(240,236,250,0.24)", gloss: "rgba(255,255,255,0.3)",
-      vortA: [104, 74, 196], vortB: [208, 206, 226],
-      weyl: ["rgba(206,90,128,0.62)", "rgba(160,126,255,0.74)", "rgba(234,232,246,0.9)"],
-      weylFade: "rgba(11,9,17,0.085)", weylGlow: "200,180,255", weylAxis: "rgba(184,178,200,0.6)",
-      pixel: [206, 202, 236],
-      sheenA: "rgba(255,255,255,0.10)", sheenB: "rgba(169,139,255,0.07)",
-      lensEdge: "rgba(236,232,250,0.75)", lensInner: "rgba(169,139,255,0.35)",
+      polyEdge: "rgba(226,220,242,0.22)", gloss: "rgba(255,255,255,0.26)",
+      vortA: [96, 70, 190], vortB: [196, 84, 122],
+      weyl: ["rgba(150,64,110,0.58)", "rgba(150,120,240,0.7)", "rgba(244,186,104,0.85)"],
+      weylFade: "rgba(11,9,17,0.085)", weylGlow: "244,186,104", weylAxis: "rgba(184,178,200,0.6)",
+      weylNode: "rgba(244,196,120,0.95)",
+      pixel: [168, 158, 232],
+      sheenA: "rgba(255,255,255,0.08)", sheenB: "rgba(169,139,255,0.07)",
+      lensEdge: "rgba(226,220,242,0.7)", lensInner: "rgba(169,139,255,0.35)",
       axisLine: "rgba(196,170,255,0.95)", axisText: "rgba(196,180,255,0.95)",
-      diodeA: [150, 112, 255], diodeB: [238, 234, 245],
+      curRGB: "244,186,104", fieldRGB: "176,150,255", slab: "rgba(226,220,242,0.4)",
     },
     light: {
-      bg: [235, 226, 214], inkRGB: "58,36,24", panelRGB: "235,226,214",
-      ringLo: [176, 100, 112], ringHi: [96, 44, 54],
-      poly: { Fe: [150, 98, 52], Zn: [168, 164, 156], Mg: [112, 70, 150] },
-      alpha: { Fe: 0.55, Zn: 0.7, Mg: 0.7 }, oxy: [150, 38, 66],
-      polyEdge: "rgba(58,36,24,0.3)", gloss: "rgba(255,255,255,0.5)",
-      vortA: [86, 44, 68], vortB: [190, 136, 78],
-      weyl: ["rgba(150,60,80,0.6)", "rgba(104,70,160,0.66)", "rgba(70,40,28,0.82)"],
-      weylFade: "rgba(235,226,214,0.085)", weylGlow: "122,39,65", weylAxis: "rgba(92,70,60,0.7)",
-      pixel: [78, 46, 34],
-      sheenA: "rgba(255,255,255,0.4)", sheenB: "rgba(122,39,65,0.06)",
-      lensEdge: "rgba(58,36,24,0.8)", lensInner: "rgba(122,39,65,0.3)",
-      axisLine: "rgba(122,39,65,0.95)", axisText: "rgba(122,39,65,0.95)",
-      diodeA: [168, 84, 98], diodeB: [58, 26, 30],
+      bg: [217, 204, 168], inkRGB: "42,31,24", panelRGB: "217,204,168",
+      ringLo: [200, 110, 40], ringHi: [96, 30, 34],
+      poly: { Fe: [184, 98, 36], Zn: [62, 118, 98], Mg: [90, 66, 142] },
+      alpha: { Fe: 0.6, Zn: 0.72, Mg: 0.72 }, oxy: [130, 34, 46],
+      polyEdge: "rgba(42,31,24,0.32)", gloss: "rgba(255,255,255,0.45)",
+      vortA: [36, 82, 68], vortB: [200, 112, 40],
+      weyl: ["rgba(112,32,40,0.8)", "rgba(24,70,56,0.85)", "rgba(168,76,12,0.95)"],
+      weylFade: "rgba(217,204,168,0.05)", weylGlow: "184,92,24", weylAxis: "rgba(70,54,40,0.75)",
+      weylNode: "rgba(42,31,24,0.95)",
+      pixel: [34,58,48],
+      sheenA: "rgba(255,255,255,0.35)", sheenB: "rgba(47,90,74,0.08)",
+      lensEdge: "rgba(42,31,24,0.85)", lensInner: "rgba(47,90,74,0.4)",
+      axisLine: "rgba(128,40,44,0.95)", axisText: "rgba(128,40,44,0.95)",
+      curRGB: "128,40,44", fieldRGB: "36,72,59", slab: "rgba(42,31,24,0.45)",
     },
   };
   let T = PAL.dark;
@@ -208,7 +210,7 @@ const labels: Record<SceneId, string> = {
     let rotY = 0, rotX = 0.38, dragging = false;
     let rates: Float32Array[] = [], peaks: number[] = [];
     let counts = new Float32Array(0), prevV = new Float32Array(0), exposure = 0;
-    const hold = 6.5, pre = 25; // seconds per sample; counts/unit pre-exposure on switch
+    const hold = 7.5, pre = 220; // seconds per sample; counts/unit pre-exposure on switch
 
     function build() {
       const { gw, gh, cell } = f;
@@ -291,7 +293,7 @@ const labels: Record<SceneId, string> = {
     }
 
     function accumulate(dt: number) {
-      const rate = rates[which], g = 40 * dt;
+      const rate = rates[which], g = 24 * dt;
       for (let k = 0; k < rate.length; k++) {
         const lam = rate[k] * g;
         counts[k] += lam + Math.sqrt(lam) * gauss();
@@ -631,8 +633,8 @@ const labels: Record<SceneId, string> = {
         g.addColorStop(1, `rgba(${T.weylGlow},0)`);
         ctx.fillStyle = g;
         ctx.beginPath(); ctx.arc(x, y, R, 0, 7); ctx.fill();
-        ctx.fillStyle = `rgba(${T.inkRGB},0.95)`;
-        ctx.beginPath(); ctx.arc(x, y, 2.5, 0, 7); ctx.fill();
+        ctx.fillStyle = T.weylNode;
+        ctx.beginPath(); ctx.arc(x, y, 3, 0, 7); ctx.fill();
         ctx.font = `${hero ? 12 : 11}px "IBM Plex Mono", monospace`;
         ctx.fillStyle = `rgba(${T.panelRGB},0.88)`;
         ctx.fillRect(x + 8, y - 26, 62, 18);
@@ -676,7 +678,9 @@ const labels: Record<SceneId, string> = {
     const f = makeField(2);
     let w = 0, h = 0, t = 0, pitch = 14, R = 80;
     let target: Pt | null = null;
-    const lens = { x: 0, y: 0, ang: 0, S: 0.3, C: 0.24, axis: 0.6 };
+    const lens = { x: 0, y: 0, ang: 0, S: 0.42, C: 0.3, axis: 0.6 };
+    let pattern = hero ? 0 : 1, vectors = false; // 0 pixels, 1 phase-shifting fringes
+    const LDIST = 0.28; // lens–screen distance (m): power in dioptres = K / L
     const A = 1.2, B = 0.9; // lens semi-axes in units of R
 
     function place(dt: number) {
@@ -690,6 +694,8 @@ const labels: Record<SceneId, string> = {
       lens.x += (want.x - lens.x) * e; lens.y += (want.y - lens.y) * e;
       lens.ang = 0.12 * Math.sin(t * 0.13);
       lens.axis = 0.6 + 1.1 * Math.sin(t * 0.1);
+      lens.S = 0.42 + 0.05 * Math.sin(t * 0.09);
+      lens.C = 0.3 + 0.05 * Math.sin(t * 0.07 + 1);
     }
 
     function draw(ctx: CanvasRenderingContext2D) {
@@ -715,18 +721,52 @@ const labels: Record<SceneId, string> = {
               sx -= k * (K[0] * dx + K[1] * dy);
               sy -= k * (K[1] * dx + K[2] * dy);
             }
-            // Square "pixels" with soft edges, as on an LCD seen up close.
-            let pu = sx * inv, pv = sy * inv;
-            pu -= Math.floor(pu) + 0.5; pv -= Math.floor(pv) + 0.5;
-            const m = Math.max(Math.abs(pu), Math.abs(pv));
-            const val = Math.max(0, Math.min(1, (0.3 - m) / 0.08));
+            let val: number;
+            if (pattern === 0) {
+              // Square "pixels" with soft edges, as on an LCD seen up close.
+              let pu = sx * inv, pv = sy * inv;
+              pu -= Math.floor(pu) + 0.5; pv -= Math.floor(pv) + 0.5;
+              const m = Math.max(Math.abs(pu), Math.abs(pv));
+              val = Math.max(0, Math.min(1, (0.3 - m) / 0.08));
+            } else {
+              // Phase-shifting fringes: the phase advances with time, as in the
+              // measurement; the lens bends them by its local slope.
+              const g = 0.5 + 0.5 * Math.cos(6.2832 * (sx * 0.955 + sy * 0.296) / (2.6 * pitch) - t * 2.4);
+              val = g * g;
+            }
             d[o + c] = BG[c] + val * (T.pixel[c] - BG[c]) * (inside ? 0.85 : 0.6);
           }
           d[o + 3] = 255;
         }
       }
       f.blit(ctx);
+      if (vectors) drawShifts(ctx, K, ca, sa);
       drawLens(ctx);
+    }
+
+    // What the camera actually measures: the shift of each pattern feature,
+    // K·(p − c), drawn as arrows over the lens.
+    function drawShifts(ctx: CanvasRenderingContext2D, K: number[], ca: number, sa: number) {
+      ctx.save();
+      ctx.strokeStyle = T.axisLine; ctx.fillStyle = T.axisLine; ctx.lineWidth = 1.3;
+      const step = 2.6 * pitch;
+      for (let gy = -A * R; gy <= A * R; gy += step)
+        for (let gx = -A * R; gx <= A * R; gx += step) {
+          const ex = gx, ey = gy;
+          const u = (ex * ca + ey * sa) / (A * R), v = (-ex * sa + ey * ca) / (B * R);
+          if (u * u + v * v > 0.85) continue;
+          const dx = K[0] * ex + K[1] * ey, dy = K[1] * ex + K[2] * ey;
+          const x0 = lens.x + ex, y0 = lens.y + ey, x1 = x0 + dx, y1 = y0 + dy;
+          const L = Math.hypot(dx, dy);
+          if (L < 1) continue;
+          const ux = dx / L, uy = dy / L;
+          ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(x1, y1);
+          ctx.lineTo(x1 - 5 * ux + 3 * uy, y1 - 5 * uy - 3 * ux);
+          ctx.lineTo(x1 - 5 * ux - 3 * uy, y1 - 5 * uy + 3 * ux);
+          ctx.closePath(); ctx.fill();
+        }
+      ctx.restore();
     }
 
     function drawLens(ctx: CanvasRenderingContext2D) {
@@ -778,12 +818,12 @@ const labels: Record<SceneId, string> = {
       }
       ctx.restore();
       const deg = ((((ax * 180) / Math.PI) % 180) + 180) % 180;
-      readout(ctx, w, hero, `cylinder axis ${deg.toFixed(0)}°`);
+      readout(ctx, w, hero, `sph ${(lens.S / LDIST).toFixed(2)} D · cyl ${(lens.C / LDIST).toFixed(2)} D · axis ${deg.toFixed(0)}°`);
     }
 
     return {
       caption:
-        "The lensmeter set-up: screen pixels seen through a spectacle lens with sphere and cylinder, its axis turning slowly. The lens displaces the pixel grid according to its power — uniformly for the sphere, along one direction for the cylinder — and reading the displacement back gives sphere, cylinder and axis. Moving the pointer over the panel moves the lens.",
+        "The lensmeter set-up: a pattern on a screen seen through a spectacle lens with sphere and cylinder, its axis turning slowly. The lens displaces the pattern according to its power — uniformly for the sphere, along one direction for the cylinder. Phase-shifting fringes, as used in deflectometry, make the displacement measurable at every point; the arrows show it, and the readout is the prescription it implies at a lens–screen distance of 28 cm. Moving the pointer over the panel moves the lens.",
       resize(nw, nh) {
         w = nw; h = nh; f.resize(w, h);
         pitch = Math.max(10, Math.min(18, h / 34));
@@ -796,57 +836,77 @@ const labels: Record<SceneId, string> = {
       settle(ctx) { place(0); draw(ctx); },
       coarsen() { if (f.cell < 4) { f.cell++; f.resize(w, h); } },
       pointer(p) { target = p; },
+      options: [
+        { label: "Pixels", active: () => pattern === 0, apply: () => { pattern = 0; } },
+        { label: "Fringes", active: () => pattern === 1, apply: () => { pattern = 1; } },
+        { label: "Shift vectors", active: () => vectors, apply: () => { vectors = !vectors; } },
+      ],
     };
   }
 
   // ------------------------------------------------------------------ diode
   // Cartoon of the mechanism of the geometric diode (not solver output): the
-  // same notched strip in a perpendicular field, driven by +J and by −J. The
-  // voltage is carried by single vortices that nucleate at the tip of the notch
-  // and cross the strip — a vortex for one current, an antivortex for the other
-  // (opposite charge and opposite current give the same Lorentz force). The
-  // rectification is the difference in how long the next one waits at the tip.
-  // The wait times below are illustrative; only their asymmetry is the point.
+  // same notched slab in a field B out of the page, driven by +J and by −J.
+  // Vortices nucleate at the tip of the notch and cross the sample; they are
+  // lines through the thickness. For one current a vortex, for the other an
+  // antivortex (opposite charge and opposite current give the same Lorentz
+  // force). The rectification is the difference in how long the next one waits
+  // at the tip, where the current crowds. Wait times are illustrative; only
+  // their asymmetry is the point. Oblique projection, front face = the face
+  // with the notch.
   function diodeScene(hero: boolean): Scene {
     const f = makeField(2);
-    const Lx = 26, Ly = 18, nx0 = 11.5, nh = 4, ntop = 1.2, nw = 5; // notch geometry (ξ)
-    const tipX = nx0 + 0.6, tipY = nh + 0.35, SPEED = 5.5;
+    const Lx = 24, Ly = 15, Lz = 6, nx0 = 10.5, nh = 4, ntop = 1.2, nw = 5; // ξ
+    const tipX = nx0 + 0.6, tipY = nh + 0.35, SPEED = 5;
+    const ZX = 0.42, ZY = 0.3; // screen offset per ξ of depth (× sc)
     const REGIMES = [
-      { label: "Weak asymmetry", waitPlus: 2.0, waitMinus: 2.4 },
-      { label: "Strong asymmetry", waitPlus: 0.9, waitMinus: 4.6 },
+      { label: "Weak asymmetry", wp: 2.0, wm: 2.4, serial: true },
+      { label: "Strong asymmetry", wp: 0.9, wm: 4.6, serial: true },
+      { label: "Higher field", wp: 0.55, wm: 1.5, serial: false },
     ];
     let regime = 1;
-    type Strip = { s: number; mode: "wait" | "move"; t: number; wait: number; x: number; y: number; n: number; stamps: number[] };
-    const mk = (s: number): Strip => ({ s, mode: "wait", t: Math.random() * 1.5, wait: 1.5, x: tipX, y: tipY, n: 0, stamps: [] });
+    type V = { x: number; y: number };
+    type Strip = { s: number; t: number; wait: number; vs: V[]; n: number; stamps: number[] };
+    const mk = (s: number): Strip => ({ s, t: Math.random(), wait: 1.5, vs: [], n: 0, stamps: [] });
     let strips = [mk(1), mk(-1)];
-    let w = 0, h = 0, sc = 10, ox = [0, 0], oy = 0, clock = 0;
+    let w = 0, h = 0, sc = 10, ox = [0, 0], oy = 0, clock = 0, tt = 0;
 
     const inNotch = (X: number, Y: number) =>
       X >= nx0 && X <= nx0 + nw && Y <= nh && (X <= nx0 + ntop || Y < (nh * (nx0 + nw - X)) / (nw - ntop));
     const waitFor = (st: Strip) => {
-      const base = st.s > 0 ? REGIMES[regime].waitPlus : REGIMES[regime].waitMinus;
-      return base * (0.88 + 0.24 * Math.random());
+      const rg = REGIMES[regime];
+      return (st.s > 0 ? rg.wp : rg.wm) * (0.88 + 0.24 * Math.random());
     };
     function rateOf(st: Strip) {
       const a = st.stamps;
       if (a.length < 3) return 0;
-      const k = Math.min(4, a.length - 1);
+      const k = Math.min(5, a.length - 1);
       return k / (a[a.length - 1] - a[a.length - 1 - k]);
     }
     function step(dt: number) {
-      clock += dt;
+      clock += dt; tt += dt;
+      const rg = REGIMES[regime];
       for (const st of strips) {
-        st.t += dt;
-        if (st.mode === "wait") {
-          if (st.t >= st.wait) { st.mode = "move"; st.x = tipX; st.y = tipY; st.t = 0; }
-        } else {
-          st.y += SPEED * dt;
-          st.x += (Math.random() - 0.5) * 0.9 * dt + 0.25 * dt;
-          if (st.y > Ly + 0.4) {
-            st.mode = "wait"; st.t = 0; st.wait = waitFor(st); st.n++;
-            st.stamps.push(clock); if (st.stamps.length > 12) st.stamps.shift();
-          }
+        if (!rg.serial || st.vs.length === 0) st.t += dt;
+        if (st.t >= st.wait && (!st.vs.length || st.vs[st.vs.length - 1].y > tipY + 2.4)) {
+          st.vs.push({ x: tipX + (Math.random() - 0.5) * 0.4, y: tipY });
+          st.t = 0; st.wait = waitFor(st);
         }
+        for (const v of st.vs) {
+          v.y += SPEED * dt;
+          v.x += (Math.random() - 0.5) * 1.0 * dt + 0.3 * dt;
+        }
+        // Vortices repel: neighbours in a train spread sideways a little.
+        for (let a = 0; a + 1 < st.vs.length; a++) {
+          const dy = st.vs[a + 1].y - st.vs[a].y;
+          if (dy < 2.6) { const g = (2.6 - dy) * 0.5 * dt; st.vs[a].x += g; st.vs[a + 1].x -= g; }
+        }
+        const keep: V[] = [];
+        for (const v of st.vs) {
+          if (v.y > Ly + 0.4) { st.n++; st.stamps.push(clock); if (st.stamps.length > 14) st.stamps.shift(); }
+          else keep.push(v);
+        }
+        st.vs = keep;
       }
     }
     function resetStrips() {
@@ -855,63 +915,120 @@ const labels: Record<SceneId, string> = {
       for (let k = 0; k < 1500; k++) step(1 / 30);
     }
 
+    // Screen position of a sample point in strip k (Z = 0 front face, Lz back).
+    const P = (k: number, X: number, Y: number, Z = 0) => [ox[k] + X * sc + Z * ZX * sc, oy - Y * sc - Z * ZY * sc];
+    const txt = (ctx: CanvasRenderingContext2D, text: string, x: number, y: number, a: number) => {
+      ctx.lineWidth = 3; ctx.lineJoin = "round";
+      ctx.strokeStyle = `rgba(${T.panelRGB},0.85)`; ctx.strokeText(text, x, y);
+      ctx.fillStyle = `rgba(${T.inkRGB},${a})`; ctx.fillText(text, x, y);
+    };
+
     function draw(ctx: CanvasRenderingContext2D) {
       const { gw, gh, cell } = f, d = f.img!.data;
+      // Front-face map with alpha: transparent outside the sample and in the notch.
       for (let j = 0; j < gh; j++) {
         const py = (j + 0.5) * cell, Y = (oy - py) / sc;
         for (let i = 0; i < gw; i++) {
           const px = (i + 0.5) * cell, k = px < w / 2 ? 0 : 1, X = (px - ox[k]) / sc, o = (j * gw + i) * 4;
-          let r = BG[0], g = BG[1], b = BG[2];
-          if (X >= 0 && X <= Lx && Y >= 0 && Y <= Ly && !inNotch(X, Y)) {
-            const st = strips[k];
-            let amp = 1, phase = 0.45 * st.s * X;
-            // Order parameter dips near the walls and, as the wait ends, at the tip.
-            const edge = Math.min(X, Lx - X, Y, Ly - Y);
-            amp *= 1 - 0.3 * Math.exp(-edge / 1.3);
-            const stress = st.mode === "wait" ? Math.min(1, st.t / Math.max(st.wait, 0.1)) : 0.25;
-            const tdx = X - tipX, tdy = Y - tipY;
-            amp *= 1 - (0.15 + 0.55 * stress) * Math.exp(-(tdx * tdx + tdy * tdy) / 3.2);
-            if (st.mode === "move") {
-              const dx = X - st.x, dy = Y - st.y, r2 = dx * dx + dy * dy;
-              if (r2 < 25) { const q = 1 - r2 / 25; amp *= 1 - (0.92 / (r2 + 0.9)) * q * q; }
-              phase += st.s * atan2(dy, dx);
-            }
-            const m = 0.5 + 0.5 * Math.cos(phase), a2 = amp * amp;
-            r = BG[0] + (T.vortA[0] + (T.vortB[0] - T.vortA[0]) * m - BG[0]) * a2;
-            g = BG[1] + (T.vortA[1] + (T.vortB[1] - T.vortA[1]) * m - BG[1]) * a2;
-            b = BG[2] + (T.vortA[2] + (T.vortB[2] - T.vortA[2]) * m - BG[2]) * a2;
+          if (!(X >= 0 && X <= Lx && Y >= 0 && Y <= Ly && !inNotch(X, Y))) { d[o + 3] = 0; continue; }
+          const st = strips[k];
+          let amp = 1, phase = 0.45 * st.s * X;
+          amp *= 1 - 0.3 * Math.exp(-Math.min(X, Lx - X, Y, Ly - Y) / 1.3);
+          const stress = (REGIMES[regime].serial && st.vs.length) ? 0.25 : Math.min(1, st.t / Math.max(st.wait, 0.1));
+          const tdx = X - tipX, tdy = Y - tipY;
+          amp *= 1 - (0.15 + 0.55 * stress) * Math.exp(-(tdx * tdx + tdy * tdy) / 3.2);
+          for (const v of st.vs) {
+            const dx = X - v.x, dy = Y - v.y, r2 = dx * dx + dy * dy;
+            if (r2 < 25) { const q = 1 - r2 / 25; amp *= 1 - (0.92 / (r2 + 0.9)) * q * q; }
+            phase += st.s * atan2(dy, dx);
           }
-          d[o] = r; d[o + 1] = g; d[o + 2] = b; d[o + 3] = 255;
+          const m = 0.5 + 0.5 * Math.cos(phase), a2 = amp * amp;
+          d[o] = BG[0] + (T.vortA[0] + (T.vortB[0] - T.vortA[0]) * m - BG[0]) * a2;
+          d[o + 1] = BG[1] + (T.vortA[1] + (T.vortB[1] - T.vortA[1]) * m - BG[1]) * a2;
+          d[o + 2] = BG[2] + (T.vortA[2] + (T.vortB[2] - T.vortA[2]) * m - BG[2]) * a2;
+          d[o + 3] = 255;
         }
       }
+      ctx.fillStyle = `rgb(${BG[0]},${BG[1]},${BG[2]})`;
+      ctx.fillRect(0, 0, w, h);
+      const poly = (k: number, pts: number[][], fill: string | null) => {
+        ctx.beginPath();
+        pts.forEach(([X, Y, Z], idx) => { const [a, b] = P(k, X, Y, Z); idx ? ctx.lineTo(a, b) : ctx.moveTo(a, b); });
+        ctx.closePath();
+        if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+        ctx.stroke();
+      };
+      ctx.save();
+      // Thickness: top face, right face and the abrupt wall of the notch (translucent slab).
+      ctx.lineWidth = 1; ctx.strokeStyle = T.slab;
+      for (let k = 0; k < 2; k++) {
+        poly(k, [[0, Ly, 0], [Lx, Ly, 0], [Lx, Ly, Lz], [0, Ly, Lz]], `rgba(${T.inkRGB},0.10)`);
+        poly(k, [[Lx, 0, 0], [Lx, Ly, 0], [Lx, Ly, Lz], [Lx, 0, Lz]], `rgba(${T.inkRGB},0.16)`);
+        poly(k, [[nx0, 0, 0], [nx0, nh, 0], [nx0, nh, Lz], [nx0, 0, Lz]], `rgba(${T.inkRGB},0.14)`);
+        // The notch runs through the whole thickness: dashed back outline.
+        ctx.setLineDash([3, 3]);
+        poly(k, [[nx0, 0, Lz], [nx0, nh, Lz], [nx0 + ntop, nh, Lz], [nx0 + nw, 0, Lz]], null);
+        ctx.setLineDash([]);
+      }
+      ctx.restore();
       f.blit(ctx);
 
       ctx.save();
-      const fs = 11;
-      ctx.font = `${fs}px "IBM Plex Mono", monospace`;
+      ctx.font = `12px "IBM Plex Mono", monospace`;
       ctx.textAlign = "center";
-      const ink = (a: number) => `rgba(${T.inkRGB},${a})`;
       strips.forEach((st, k) => {
-        const x0 = ox[k], x1 = ox[k] + Lx * sc, yTop = oy - Ly * sc;
-        // Notch outline.
-        ctx.strokeStyle = T.axisLine; ctx.lineWidth = 1.6; ctx.beginPath();
-        ctx.moveTo(x0 + nx0 * sc, oy); ctx.lineTo(x0 + nx0 * sc, oy - nh * sc);
-        ctx.lineTo(x0 + (nx0 + ntop) * sc, oy - nh * sc); ctx.lineTo(x0 + (nx0 + nw) * sc, oy); ctx.stroke();
-        // Current arrow above the strip.
-        const ya = yTop - 16, dir = st.s;
-        ctx.strokeStyle = ink(0.8); ctx.fillStyle = ink(0.8); ctx.lineWidth = 1.6;
-        const a0 = dir > 0 ? x0 + 0.2 * (x1 - x0) : x1 - 0.2 * (x1 - x0), a1 = dir > 0 ? x1 - 0.2 * (x1 - x0) : x0 + 0.2 * (x1 - x0);
-        ctx.beginPath(); ctx.moveTo(a0, ya); ctx.lineTo(a1, ya); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(a1, ya); ctx.lineTo(a1 - dir * 7, ya - 4); ctx.lineTo(a1 - dir * 7, ya + 4); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = ink(0.95);
-        ctx.fillText(st.s > 0 ? "+J" : "−J", (x0 + x1) / 2, ya - 6);
-        // Counter and measured rate below.
-        const rt = rateOf(st);
-        ctx.fillStyle = ink(0.85);
-        ctx.fillText(`${st.s > 0 ? "vortex" : "antivortex"} crossings: ${st.n}`, (x0 + x1) / 2, oy + 18);
-        ctx.fillStyle = ink(0.6);
-        ctx.fillText((rt ? `rate ${rt.toFixed(2)} /s` : "rate …") + (st.mode === "wait" ? " · waiting at the tip" : " · crossing"), (x0 + x1) / 2, oy + 32);
+        // Front outline with the notch.
+        ctx.strokeStyle = T.slab; ctx.lineWidth = 1.6;
+        const [ax, ay] = P(k, 0, 0);
+        ctx.beginPath(); ctx.moveTo(ax, ay);
+        for (const [X, Y] of [[nx0, 0], [nx0, nh], [nx0 + ntop, nh], [nx0 + nw, 0], [Lx, 0], [Lx, Ly], [0, Ly]]) { const [a, b] = P(k, X, Y); ctx.lineTo(a, b); }
+        ctx.closePath(); ctx.stroke();
+        // Current streamlines: they bend over the notch and crowd at its tip.
+        ctx.lineWidth = 1.4; ctx.setLineDash([7, 8]);
+        ctx.lineDashOffset = -st.s * tt * 22;
+        ctx.strokeStyle = `rgba(${T.curRGB},0.62)`;
+        for (const y0 of [1.5, 4.5, 7.5, 10.5, 13.5]) {
+          const A = y0 < nh + 1.2 ? 0.9 * (nh + 1.2 - y0) : 0;
+          ctx.beginPath();
+          for (let X = 0; X <= Lx + 0.01; X += 0.5) {
+            const u = (X - (nx0 + 1.8)) / 3.4;
+            const Y = y0 + A * Math.exp(-u * u);
+            const [a, b] = P(k, X, Y); X === 0 ? ctx.moveTo(a, b) : ctx.lineTo(a, b);
+          }
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
+        // Vortex lines through the thickness.
+        ctx.lineWidth = 2.2;
+        ctx.strokeStyle = `rgba(${T.inkRGB},0.9)`;
+        for (const v of st.vs) {
+          const [a, b] = P(k, v.x, v.y, 0), [c, e] = P(k, v.x, v.y, Lz);
+          ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(c, e); ctx.stroke();
+        }
+        // Current arrow above the slab, counters below.
+        const [tx0, ty0] = P(k, 0.15 * Lx, Ly, Lz), [tx1] = P(k, 0.85 * Lx, Ly, Lz), yar = ty0 - 14, dir = st.s;
+        const aS = dir > 0 ? tx0 : tx1, aE = dir > 0 ? tx1 : tx0;
+        ctx.strokeStyle = `rgba(${T.curRGB},0.95)`; ctx.fillStyle = `rgba(${T.curRGB},0.95)`; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(aS, yar); ctx.lineTo(aE, yar); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(aE, yar); ctx.lineTo(aE - dir * 8, yar - 4.5); ctx.lineTo(aE - dir * 8, yar + 4.5); ctx.closePath(); ctx.fill();
+        txt(ctx, st.s > 0 ? "+J" : "−J", (aS + aE) / 2, yar - 7, 0.95);
+        const cxm = ox[k] + (Lx * sc + Lz * ZX * sc) / 2, rt = rateOf(st);
+        txt(ctx, `${st.s > 0 ? "vortex" : "antivortex"} crossings: ${st.n}`, cxm, oy + 22, 0.95);
+        txt(ctx, (rt ? `rate ${rt.toFixed(2)} /s` : "rate …") + (REGIMES[regime].serial ? (st.vs.length ? " · crossing" : " · waiting at the tip") : ""), cxm, oy + 38, 0.8);
       });
+      // Legend.
+      ctx.textAlign = "left";
+      ctx.font = `11px "IBM Plex Mono", monospace`;
+      if (!(w < 560)) {
+        const lx = 14, ly = 22;
+        txt(ctx, "⊙  field B, out of the page", lx, ly, 0.9);
+        ctx.strokeStyle = `rgba(${T.curRGB},0.9)`; ctx.lineWidth = 1.6; ctx.setLineDash([6, 5]);
+        ctx.beginPath(); ctx.moveTo(lx, ly + 16); ctx.lineTo(lx + 20, ly + 16); ctx.stroke(); ctx.setLineDash([]);
+        txt(ctx, "current lines (crowd at the tip)", lx + 28, ly + 20, 0.9);
+        ctx.strokeStyle = `rgba(${T.inkRGB},0.9)`; ctx.lineWidth = 2.2;
+        ctx.beginPath(); ctx.moveTo(lx + 8, ly + 30); ctx.lineTo(lx + 14, ly + 38); ctx.stroke();
+        txt(ctx, "vortex line through the thickness", lx + 28, ly + 40, 0.9);
+      }
       ctx.restore();
       const rp = rateOf(strips[0]), rm = rateOf(strips[1]);
       const nr = rp + rm > 0 ? (rp - rm) / (rp + rm) : 0;
@@ -920,13 +1037,14 @@ const labels: Record<SceneId, string> = {
 
     return {
       caption:
-        "The geometric diode in one picture: the same notched strip in a perpendicular field, driven by +J (left) and by −J (right). The voltage is carried by single vortices that nucleate at the tip of the notch and cross the strip, one per period — a vortex for one current, an antivortex for the other. Rectification is the difference in how long the next one waits at the tip, where the order parameter dims as the wait ends. Switch the regime to compare a weak and a strong asymmetry. A cartoon of the mechanism with illustrative parameters, not solver output.",
+        "The geometric diode in one picture: the same notched slab in a field out of the page, driven by +J (left) and by −J (right). The current lines bend over the notch and crowd at its tip, where vortices nucleate and cross the sample as lines through its thickness — a vortex for one current, an antivortex for the other. Rectification is the difference in how long the next one waits at the tip, where the order parameter dims as the wait ends. Switch to compare a weak and a strong asymmetry, or a higher field with a train of vortices. A cartoon of the mechanism with illustrative parameters, not solver output.",
       options: REGIMES.map((rg, idx) => ({ label: rg.label, active: () => regime === idx, apply: () => { regime = idx; resetStrips(); } })),
       resize(nw2, nh2) {
         w = nw2; h = nh2; f.resize(w, h);
-        sc = Math.max(5, Math.min((w / 2 - 28) / Lx, (h - 124) / Ly));
-        oy = h - 84;
-        ox = [w * 0.25 - (Lx * sc) / 2, w * 0.75 - (Lx * sc) / 2];
+        sc = Math.max(5, Math.min((w / 2 - 30) / (Lx + Lz * ZX), (h - 166) / (Ly + Lz * ZY)));
+        oy = h - 98;
+        const span = Lx * sc + Lz * ZX * sc;
+        ox = [w * 0.25 - span / 2, w * 0.75 - span / 2];
         resetStrips();
       },
       reset() { resetStrips(); },
@@ -963,6 +1081,7 @@ const labels: Record<SceneId, string> = {
     root.querySelector(".scenes-hud")!.prepend(optsBox);
     function drawOptions() {
       optsBox.innerHTML = "";
+      if (hero) return; // the hero keeps only the scene tabs
       for (const o of scenes[cur].options ?? []) {
         const b = document.createElement("button");
         b.type = "button"; b.textContent = o.label;

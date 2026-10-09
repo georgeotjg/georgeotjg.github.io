@@ -1,36 +1,36 @@
-/* Palette after Drive (2011), in its cooler register: night = violet-black
-   with violet neon, silver chrome and wine; day = warm paper with coffee and
-   wine, headings in dark plum. The theme follows the system until the
+/* Two themes. Night, after Drive (2011): violet-black, violet, silver, wine.
+   Day, a garden in autumn with coffee: parchment, forest green, pumpkin and
+   burgundy. The theme follows the system until the
    visitor picks one (header toggle, stored in localStorage). */
 :root {
-  --bg: #f4efe8;
-  --surface: #fbf8f3;
-  --ink: #261d22;
-  --heading: #3b1f33;
-  --muted: #6c5f5e;
-  --rule: #e3d9cd;
-  --accent: #7a2741;
-  --accent-soft: #efe2d6;
+  --bg: #efe6d2;
+  --surface: #f6eedb;
+  --ink: #2a1f18;
+  --heading: #24483b;
+  --muted: #6b5a49;
+  --rule: #dccfb4;
+  --accent: #a84a14;
+  --accent-soft: #e6d8b8;
   --warm: #5c3b2c;
-  --primary: #5c3b2c;
-  --on-primary: #fbf8f3;
-  --hero-bg: #ebe2d6;
-  --hero-rgb: 235, 226, 214;
-  --hero-ink: #2e1c14;
-  --hero-muted: #6a5148;
-  --hero-accent: #7a2741;
-  --hero-on-accent: #fbf8f3;
-  --hero-link: #5c3b2c;
-  --hero-glow: rgba(122, 39, 65, 0.16);
-  --hud-bg: rgba(244, 239, 232, 0.86);
-  --hud-ink: #3a2418;
-  --hud-line: rgba(58, 36, 24, 0.28);
-  --ghost-bg: rgba(58, 36, 24, 0.05);
-  --ghost-line: rgba(58, 36, 24, 0.3);
-  --portrait-line: rgba(58, 36, 24, 0.4);
-  --neon: #b0703a;
-  --silver: #5c3b2c;
-  --wine: #7a2741;
+  --primary: #24483b;
+  --on-primary: #f6eedb;
+  --hero-bg: #d9cca8;
+  --hero-rgb: 217, 204, 168;
+  --hero-ink: #2a1f18;
+  --hero-muted: #5b4a39;
+  --hero-accent: #2f5a4a;
+  --hero-on-accent: #f6eedb;
+  --hero-link: #7a2a2a;
+  --hero-glow: rgba(180, 92, 24, 0.18);
+  --hud-bg: rgba(246, 238, 219, 0.9);
+  --hud-ink: #2a1f18;
+  --hud-line: rgba(42, 31, 24, 0.3);
+  --ghost-bg: rgba(42, 31, 24, 0.06);
+  --ghost-line: rgba(42, 31, 24, 0.32);
+  --portrait-line: rgba(42, 31, 24, 0.45);
+  --neon: #c4691f;
+  --silver: #7a2a2a;
+  --wine: #2f5a4a;
   --max: 60rem;
   --text: 40rem;
   --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
