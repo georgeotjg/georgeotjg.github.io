@@ -140,6 +140,7 @@ export const weyl = {
     "Analytic Weyl lattice model in real time (Julia): reproduces the quantized circular photogalvanic response of de Juan et al. (2017) without perturbative formulas (Tr β/β₀ = 1.014 on a 96³ grid), and shows the breakdown and Rabi-like rebound of quantization at strong fields.",
     "Octopus real-time TDDFT validated on silicon, including a symmetry null test: a zero-area pulse leaves no DC current, as inversion requires.",
     "Quantum ESPRESSO → Wannier90 chain for GaAs running, with band energies reproduced at high-symmetry points — the starting point for the shift-current benchmark.",
+    "Interactions in the model: a local mean field barely changes the quantized response, while a non-local exchange term breaks it already at first order.",
   ],
   next: "Shift current of GaAs against the literature, then a measured Weyl semimetal.",
 };
