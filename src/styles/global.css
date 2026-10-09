@@ -918,3 +918,58 @@ footer.site p {
     text-decoration: none;
   }
 }
+
+/* In-page index */
+
+.toc {
+  display: none;
+}
+
+@media (min-width: 1480px) {
+  .toc {
+    display: block;
+    position: fixed;
+    top: 6rem;
+    left: max(1rem, calc(50% - 30rem - 13.5rem));
+    width: 11.5rem;
+    font-size: 0.82rem;
+    z-index: 5;
+  }
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 0.5rem;
+  }
+  .toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 1px solid var(--rule);
+  }
+  .toc li a {
+    display: block;
+    padding: 0.22rem 0 0.22rem 0.8rem;
+    margin-left: -1px;
+    border-left: 2px solid transparent;
+    color: var(--muted);
+    text-decoration: none;
+  }
+  .toc li.sub a {
+    padding-left: 1.5rem;
+    font-size: 0.78rem;
+  }
+  .toc li a:hover {
+    color: var(--ink);
+  }
+  .toc li a[aria-current] {
+    color: var(--accent);
+    border-left-color: var(--accent);
+  }
+}
+
+html {
+  scroll-padding-top: 4.5rem;
+}

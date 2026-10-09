@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import PhysicsScenes from "../components/PhysicsScenes.astro";
+import Toc from "../components/Toc.astro";
 import { solver, paper, findings, figuresPaper, weyl, optics, site } from "../data/site";
 ---
 
@@ -8,6 +9,16 @@ import { solver, paper, findings, figuresPaper, weyl, optics, site } from "../da
   title="Research"
   description="Two-band superconductor simulation with a validated 3D TDGL solver, first-principles nonlinear optics of Weyl semimetals, and low-cost computational optics."
 >
+  <Toc items={[
+    { id: "superconductivity", label: "Superconductivity" },
+    { id: "validation", label: "Validation", sub: true },
+    { id: "paper1", label: "Methods paper", sub: true },
+    { id: "figures", label: "Figures", sub: true },
+    { id: "paper2", label: "Second paper", sub: true },
+    { id: "currently", label: "Currently", sub: true },
+    { id: "weyl", label: "Weyl semimetals" },
+    { id: "optics", label: "Lensmeter" },
+  ]} />
   <div class="wrap">
     <p class="kicker">Research</p>
     <h1>Superconductivity, light and matter</h1>
@@ -38,12 +49,12 @@ import { solver, paper, findings, figuresPaper, weyl, optics, site } from "../da
 
       <PhysicsScenes scenes={["vortex"]} />
 
-      <h3 style="margin-top:1.8rem">Validation</h3>
+      <h3 id="validation" style="margin-top:1.8rem">Validation</h3>
       <ul class="points">
         {solver.validation.map((v) => <li>{v}</li>)}
       </ul>
 
-      <h3 style="margin-top:2rem">Methods paper</h3>
+      <h3 id="paper1" style="margin-top:2rem">Methods paper</h3>
       <p class="paper-title"><a href={site.paperDoi}>{paper.title}</a></p>
       <p class="meta">{paper.meta}</p>
       <p class="cta-row">
@@ -62,7 +73,7 @@ import { solver, paper, findings, figuresPaper, weyl, optics, site } from "../da
         ))
       }
 
-      <h3 style="margin-top:2.2rem">Figures from the paper</h3>
+      <h3 id="figures" style="margin-top:2.2rem">Figures from the paper</h3>
       <div class="figs two">
         {
           figuresPaper.map((fig) => (
@@ -76,7 +87,7 @@ import { solver, paper, findings, figuresPaper, weyl, optics, site } from "../da
         }
       </div>
 
-      <h3 style="margin-top:2rem">Second paper (manuscript under review)</h3>
+      <h3 id="paper2" style="margin-top:2rem">Second paper (manuscript under review)</h3>
       <p class="paper-title">Rectification in a notched two-band box at low field: two screening regimes and the terms that leave it unchanged</p>
       <p>
         At a field where the box holds no vortex at zero current, the voltage is
@@ -86,7 +97,7 @@ import { solver, paper, findings, figuresPaper, weyl, optics, site } from "../da
         potential, charge relaxation and heating on the onsets.
       </p>
 
-      <h3 style="margin-top:2rem">Currently</h3>
+      <h3 id="currently" style="margin-top:2rem">Currently</h3>
       <p>
         The same geometric diode at MgB₂-like parameters — strong screening and
         well-separated coherence lengths of the two bands — and what Joule

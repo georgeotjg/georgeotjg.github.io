@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import PhysicsScenes from "../components/PhysicsScenes.astro";
+import Toc from "../components/Toc.astro";
 import { site, thesis } from "../data/site";
 ---
 
@@ -8,7 +9,14 @@ import { site, thesis } from "../data/site";
   title="Lab"
   description="Bachelor's thesis: combustion synthesis of Zn–Mg spinel ferrites, XRD/Rietveld, SEM/EDX and UV-Vis, read against GGA+U band structures."
 >
-  <div class="wrap">
+  <Toc items={[
+    { id: "top", label: "Overview" },
+    { id: "results", label: "Main results" },
+    { id: "synthesis", label: "Synthesis" },
+    { id: "structure", label: "Structure" },
+    { id: "optical", label: "Optical gap" },
+  ]} />
+  <div class="wrap" id="top">
     <p class="kicker">Experimental materials physics</p>
     <h1>{thesis.short}</h1>
     <p class="lede">{thesis.title}.</p>
@@ -20,13 +28,13 @@ import { site, thesis } from "../data/site";
 
     <PhysicsScenes scenes={["crystal"]} />
 
-    <h2>Main results</h2>
+    <h2 id="results">Main results</h2>
     <ul class="points">
       {thesis.findings.map((f) => <li>{f}</li>)}
     </ul>
     <p class="meta">{thesis.followUp}</p>
 
-    <h2>Synthesis</h2>
+    <h2 id="synthesis">Synthesis</h2>
     <div class="figs two tiles">
       <figure>
         <a href="/figs/lab_precombustion.jpg" target="_blank" rel="noopener">
@@ -42,7 +50,7 @@ import { site, thesis } from "../data/site";
       </figure>
     </div>
 
-    <h2>Structure and microstructure</h2>
+    <h2 id="structure">Structure and microstructure</h2>
     <div class="figs two">
       <figure>
         <a href="/figs/lab_rietveld_mixta.jpg" target="_blank" rel="noopener">
@@ -82,7 +90,7 @@ import { site, thesis } from "../data/site";
       </figure>
     </div>
 
-    <h2>Optical gap</h2>
+    <h2 id="optical">Optical gap</h2>
     <div class="figs">
       <figure>
         <a href="/figs/lab_tauc_series.png" target="_blank" rel="noopener">

@@ -1,0 +1,27 @@
+---
+// In-page index, fixed in the left margin on wide screens; highlights the
+// section being read.
+interface Props {
+  items: { id: string; label: string; sub?: boolean }[];
+}
+const { items } = Astro.props;
+---
+
+<nav class="toc" aria-label="On this page">
+  <p class="toc-title">On this page</p>
+  <ul>
+    {items.map((it) => <li class={it.sub ? "sub" : undefined}><a href={`#${it.id}`} data-toc={it.id}>{it.label}</a></li>)}
+  </ul>
+</nav>
+
+<script>
+  const links = [...document.querySelectorAll<HTMLAnchorElement>("[data-toc]")];
+  const targets = links.map((a) => document.getElementById(a.dataset.toc!)).filter(Boolean) as HTMLElement[];
+  const mark = () => {
+    let cur = targets[0];
+    for (const t of targets) if (t.getBoundingClientRect().top < window.innerHeight * 0.3) cur = t;
+    links.forEach((a) => a.toggleAttribute("aria-current", a.dataset.toc === cur?.id));
+  };
+  window.addEventListener("scroll", mark, { passive: true });
+  mark();
+</script>

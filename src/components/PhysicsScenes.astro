@@ -170,32 +170,44 @@ const labels: Record<SceneId, string> = {
       D = ((hero ? 0.42 : 0.38) * Math.min(f.w, f.h * 1.6)) / Math.tan((35.43 * Math.PI) / 180);
       L = (hero ? 0.29 : 0.33) * Math.min(f.h, f.w * 0.6);
       rates = []; peaks = [];
-      for (const sample of SAMPLES) {
-        const rate = new Float32Array(gw * gh);
-        let peak = 0;
-        for (let j = 0; j < gh; j++)
-          for (let i = 0; i < gw; i++) {
-            const x = (i + 0.5) * cell - cx, y = (j + 0.5) * cell - cy;
-            const r = Math.hypot(x, y);
-            const tth = (Math.atan(r / D) * 180) / Math.PI;
-            // Display floor on the width: a ring must span at least ~1.5 cells.
-            const pxPerDeg = (D * (Math.PI / 180)) / Math.cos((tth * Math.PI) / 180) ** 2;
-            const floor = (1.5 * cell) / pxPerDeg;
-            let I = 0.6;
-            for (const [p, w, a] of sample.peaks) {
-              const fw = Math.sqrt(w * w + floor * floor);
-              const u = (tth - p) / (fw / 2);
-              I += a * (0.5 / (1 + u * u) + 0.5 * Math.exp(-0.693 * u * u));
-            }
-            if (r < 0.03 * f.h) I = 0; // beam stop
-            rate[j * gw + i] = I;
-            if (I > peak) peak = I;
-          }
-        rates.push(rate); peaks.push(peak);
-      }
+      ensureRate(which);
       counts = new Float32Array(gw * gh);
       prevV = new Float32Array(gw * gh);
       expose(pre);
+    }
+
+    // Rings are radially symmetric: build a 1D profile I(r) once per sample and
+    // look it up per pixel, and only when that sample is first shown.
+    function ensureRate(idx: number) {
+      if (rates[idx]) return;
+      const { gw, gh, cell } = f;
+      const sample = SAMPLES[idx];
+      const dr = 0.5, rmax = Math.hypot(f.w, f.h) + 2;
+      const prof = new Float32Array(Math.ceil(rmax / dr) + 2);
+      for (let k = 0; k < prof.length; k++) {
+        const r = k * dr;
+        const tth = (Math.atan(r / D) * 180) / Math.PI;
+        // Display floor on the width: a ring must span at least ~1.5 cells.
+        const pxPerDeg = (D * (Math.PI / 180)) / Math.cos((tth * Math.PI) / 180) ** 2;
+        const floor = (1.5 * cell) / pxPerDeg;
+        let I = 0.6;
+        for (const [p, w, a] of sample.peaks) {
+          const fw = Math.sqrt(w * w + floor * floor);
+          const u = (tth - p) / (fw / 2);
+          I += a * (0.5 / (1 + u * u) + 0.5 * Math.exp(-0.693 * u * u));
+        }
+        prof[k] = r < 0.03 * f.h ? 0 : I; // beam stop
+      }
+      const rate = new Float32Array(gw * gh);
+      let peak = 0;
+      for (let j = 0; j < gh; j++)
+        for (let i = 0; i < gw; i++) {
+          const r = Math.hypot((i + 0.5) * cell - cx, (j + 0.5) * cell - cy);
+          const I = prof[Math.round(r / dr)];
+          rate[j * gw + i] = I;
+          if (I > peak) peak = I;
+        }
+      rates[idx] = rate; peaks[idx] = peak;
     }
 
     // Cation on each site for each sample (A sites are cations 0–7, B sites 8–23).
@@ -216,6 +228,7 @@ const labels: Record<SceneId, string> = {
       for (let k = 0; k < counts.length; k++) prevV[k] = Math.min(1, Math.max(0, counts[k] * norm));
       prev = which;
       which = (which + 1) % SAMPLES.length;
+      ensureRate(which);
       blend = 0;
       expose(pre);
     }

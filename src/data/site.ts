@@ -64,7 +64,8 @@ export const solver = {
   versions: [
     { tag: "v13.3", what: "Octave reference implementation (hash df37e31c), the origin of the stored reference states." },
     { tag: "v14.1", what: "Julia port, bit for bit against v13.3, with an optional scalar potential by Coulomb projection." },
-    { tag: "1.0", what: "juliaTDGL, public release (MIT, October 2026): optional terms for interband drag, heating, Joule dissipation and bath temperature, all off by default; a terminal menu for runs and a browser editor for 3D sample shapes." },
+    { tag: "1.0", what: "juliaTDGL, public release (MIT, October 2026): optional terms for interband drag, heating, Joule dissipation and bath temperature, all off by default; a Strict mode that reproduces the reference bit for bit and a Fast mode; a terminal menu for runs and a browser editor for 3D sample shapes." },
+    { tag: "1.1", what: "In development: an implicit treatment of the Maxwell step, which removes the time-step limit of strongly screened samples, and a 3D view of the sample geometry." },
   ],
   validation: [
     "Bit-for-bit agreement with the stored reference states (maximum difference 0 on 32 arrays).",

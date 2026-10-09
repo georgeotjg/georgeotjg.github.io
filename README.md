@@ -26,4 +26,4 @@ npm run build     # writes docs/
 The animated backgrounds are computed in the browser from analytic models and, for the crystal,
 from measured X-ray diffraction data; they are illustrations, not output from the research codes.
 
-Text and figures © Jorge Alfredo Robles Calderón.
+Code under the MIT License; text, figures, photographs and documents © Jorge Alfredo Robles Calderón, all rights reserved. See `LICENSE`.
