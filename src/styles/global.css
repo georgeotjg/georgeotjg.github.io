@@ -1,36 +1,36 @@
 /* Two themes. Night, after Drive (2011): violet-black, violet, silver, wine.
-   Day: parchment and coffee; the scenes bring their own blue, red and amber. The theme follows the system until the
+   Day: sand paper and coffee ink, with Earthsong (editor theme) brown panels. The theme follows the system until the
    visitor picks one (header toggle, stored in localStorage). */
 :root {
-  --bg: #efe6d2;
-  --surface: #f6eedb;
-  --ink: #2a1f18;
-  --heading: #3d2517;
-  --muted: #6b5a49;
-  --rule: #dccfb4;
-  --accent: #9a4a1c;
-  --accent-soft: #e6d8b8;
-  --warm: #5c3b2c;
-  --primary: #5c3b2c;
-  --on-primary: #f6eedb;
-  --hero-bg: #d9cca8;
-  --hero-rgb: 217, 204, 168;
-  --ring: rgba(30, 80, 160, 0.3);
-  --hero-ink: #2a1f18;
-  --hero-muted: #5b4a39;
-  --hero-accent: #5c3b2c;
-  --hero-on-accent: #f6eedb;
-  --hero-link: #8a4a1a;
-  --hero-glow: rgba(154, 74, 28, 0.18);
-  --hud-bg: rgba(246, 238, 219, 0.9);
-  --hud-ink: #2a1f18;
-  --hud-line: rgba(42, 31, 24, 0.3);
-  --ghost-bg: rgba(42, 31, 24, 0.06);
-  --ghost-line: rgba(42, 31, 24, 0.32);
-  --portrait-line: rgba(42, 31, 24, 0.45);
-  --neon: #b8742f;
-  --silver: #8a6a3a;
-  --wine: #5c3b2c;
+  --bg: #f3ead9;
+  --surface: #faf4e7;
+  --ink: #292520;
+  --heading: #3a2a1c;
+  --muted: #675f54;
+  --rule: #e2d4ba;
+  --accent: #b03a22;
+  --accent-soft: #ead9bb;
+  --warm: #6b4a30;
+  --primary: #4a3524;
+  --on-primary: #f6ecd9;
+  --hero-bg: #292520;
+  --hero-rgb: 41, 37, 32;
+  --ring: rgba(208, 99, 61, 0.34);
+  --hero-ink: #f0dfc6;
+  --hero-muted: #c4ae92;
+  --hero-accent: #e5c7a9;
+  --hero-on-accent: #292520;
+  --hero-link: #f0b65a;
+  --hero-glow: rgba(245, 174, 46, 0.2);
+  --hud-bg: rgba(41, 37, 32, 0.82);
+  --hud-ink: #e5c7a9;
+  --hud-line: rgba(229, 199, 169, 0.28);
+  --ghost-bg: rgba(229, 199, 169, 0.07);
+  --ghost-line: rgba(229, 199, 169, 0.32);
+  --portrait-line: rgba(229, 199, 169, 0.55);
+  --neon: #f5ae2e;
+  --silver: #85c54c;
+  --wine: #c94234;
   --max: 60rem;
   --text: 40rem;
   --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;

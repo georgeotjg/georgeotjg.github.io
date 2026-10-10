@@ -78,20 +78,21 @@ const labels: Record<SceneId, string> = {
       curRGB: "244,186,104", fieldRGB: "176,150,255", forceRGB: "246,120,160", slab: "rgba(226,220,242,0.4)",
     },
     light: {
-      bg: [217, 204, 168], core: [26, 24, 66], inkRGB: "42,31,24", panelRGB: "217,204,168",
-      ringLo: [78, 128, 196], ringHi: [20, 40, 110],
-      poly: { Fe: [200, 146, 36], Zn: [46, 98, 170], Mg: [172, 50, 50] },
-      alpha: { Fe: 0.62, Zn: 0.72, Mg: 0.72 }, oxy: [74, 44, 32],
-      polyEdge: "rgba(42,31,24,0.32)", gloss: "rgba(255,255,255,0.45)",
-      vortA: [30, 84, 170], vortB: [236, 180, 44],
-      weyl: ["rgba(170,36,36,0.8)", "rgba(30,80,160,0.85)", "rgba(196,132,12,0.95)"],
-      weylFade: "rgba(217,204,168,0.05)", weylGlow: "196,132,12", weylAxis: "rgba(70,54,40,0.75)",
-      weylNode: "rgba(42,31,24,0.95)",
-      pixel: [30, 62, 140],
-      sheenA: "rgba(255,255,255,0.35)", sheenB: "rgba(30,80,160,0.08)",
-      lensEdge: "rgba(42,31,24,0.85)", lensInner: "rgba(30,80,160,0.4)",
-      axisLine: "rgba(170,36,36,0.95)", axisText: "rgba(170,36,36,0.95)",
-      curRGB: "30,76,160", fieldRGB: "250,236,196", forceRGB: "176,40,40", slab: "rgba(42,31,24,0.45)",
+      // Earthsong: warm dark brown panels on a sand page.
+      bg: [41, 37, 32], core: [18, 20, 24], inkRGB: "229,199,169", panelRGB: "41,37,32",
+      ringLo: [201, 92, 52], ringHi: [250, 214, 140],
+      poly: { Fe: [236, 164, 60], Zn: [96, 168, 108], Mg: [206, 72, 56] },
+      alpha: { Fe: 0.55, Zn: 0.7, Mg: 0.7 }, oxy: [229, 198, 170],
+      polyEdge: "rgba(229,199,169,0.26)", gloss: "rgba(255,255,255,0.3)",
+      vortA: [70, 142, 96], vortB: [240, 150, 64],
+      weyl: ["rgba(240,104,90,0.78)", "rgba(132,200,92,0.8)", "rgba(245,174,46,0.95)"],
+      weylFade: "rgba(41,37,32,0.085)", weylGlow: "245,174,46", weylAxis: "rgba(196,174,146,0.7)",
+      weylNode: "rgba(246,236,214,0.95)",
+      pixel: [229, 199, 169],
+      sheenA: "rgba(255,255,255,0.08)", sheenB: "rgba(245,174,46,0.07)",
+      lensEdge: "rgba(229,199,169,0.78)", lensInner: "rgba(245,174,46,0.35)",
+      axisLine: "rgba(255,112,92,0.95)", axisText: "rgba(255,132,112,0.95)",
+      curRGB: "245,174,46", fieldRGB: "120,214,236", forceRGB: "255,104,90", slab: "rgba(229,199,169,0.42)",
     },
   };
   let T = PAL.dark;
@@ -287,7 +288,7 @@ const labels: Record<SceneId, string> = {
       const rate = rates[which];
       exposure = g;
       for (let k = 0; k < rate.length; k++) {
-        const lam = rate[k] * g;
+        const lam = Math.max(0, rate[k] * g);
         counts[k] = lam + Math.sqrt(lam) * gauss();
       }
     }
@@ -295,7 +296,7 @@ const labels: Record<SceneId, string> = {
     function accumulate(dt: number) {
       const rate = rates[which], g = 24 * dt;
       for (let k = 0; k < rate.length; k++) {
-        const lam = rate[k] * g;
+        const lam = Math.max(0, rate[k] * g);
         counts[k] += lam + Math.sqrt(lam) * gauss();
       }
       exposure += g;
@@ -1163,7 +1164,8 @@ const labels: Record<SceneId, string> = {
     function loop(now: number) {
       cancelAnimationFrame(raf);
       if (!running || !visible || document.hidden) return;
-      const dt = Math.min(0.05, last ? (now - last) / 1000 : 1 / 30);
+      // Never negative: a rAF timestamp can precede the performance.now() passed by resume().
+      const dt = Math.max(0, Math.min(0.05, last ? (now - last) / 1000 : 1 / 30));
       last = now;
       if (auto && now - lastSwitch > 20000) go((cur + 1) % scenes.length);
       const t0 = performance.now();
@@ -1173,7 +1175,7 @@ const labels: Record<SceneId, string> = {
       raf = requestAnimationFrame(loop);
     }
 
-    function resume() { last = 0; loop(performance.now()); }
+    function resume() { last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); }
 
     tabs.forEach((b, i) => b.addEventListener("click", () => { auto = false; go(i); }));
     pauseBtn.addEventListener("click", () => {
