@@ -1,36 +1,36 @@
 /* Two themes. Night, after Drive (2011): violet-black, violet, silver, wine.
-   Day, a garden in autumn with coffee: parchment, forest green, pumpkin and
-   burgundy. The theme follows the system until the
+   Day: parchment and coffee; the scenes bring their own blue, red and amber. The theme follows the system until the
    visitor picks one (header toggle, stored in localStorage). */
 :root {
   --bg: #efe6d2;
   --surface: #f6eedb;
   --ink: #2a1f18;
-  --heading: #24483b;
+  --heading: #3d2517;
   --muted: #6b5a49;
   --rule: #dccfb4;
-  --accent: #a84a14;
+  --accent: #9a4a1c;
   --accent-soft: #e6d8b8;
   --warm: #5c3b2c;
-  --primary: #24483b;
+  --primary: #5c3b2c;
   --on-primary: #f6eedb;
   --hero-bg: #d9cca8;
   --hero-rgb: 217, 204, 168;
+  --ring: rgba(30, 80, 160, 0.3);
   --hero-ink: #2a1f18;
   --hero-muted: #5b4a39;
-  --hero-accent: #2f5a4a;
+  --hero-accent: #5c3b2c;
   --hero-on-accent: #f6eedb;
-  --hero-link: #7a2a2a;
-  --hero-glow: rgba(180, 92, 24, 0.18);
+  --hero-link: #8a4a1a;
+  --hero-glow: rgba(154, 74, 28, 0.18);
   --hud-bg: rgba(246, 238, 219, 0.9);
   --hud-ink: #2a1f18;
   --hud-line: rgba(42, 31, 24, 0.3);
   --ghost-bg: rgba(42, 31, 24, 0.06);
   --ghost-line: rgba(42, 31, 24, 0.32);
   --portrait-line: rgba(42, 31, 24, 0.45);
-  --neon: #c4691f;
-  --silver: #7a2a2a;
-  --wine: #2f5a4a;
+  --neon: #b8742f;
+  --silver: #8a6a3a;
+  --wine: #5c3b2c;
   --max: 60rem;
   --text: 40rem;
   --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
@@ -54,6 +54,8 @@
     --on-primary: #140f1f;
     --hero-bg: #0b0911;
     --hero-rgb: 11, 9, 17;
+    --ring: rgba(150, 112, 255, 0.3);
+  --ring: rgba(150, 112, 255, 0.3);
     --hero-ink: #e6e0f2;
     --hero-muted: #b6aec6;
     --hero-accent: #a98bff;
@@ -87,6 +89,7 @@
   --on-primary: #140f1f;
   --hero-bg: #0b0911;
   --hero-rgb: 11, 9, 17;
+  --ring: rgba(150, 112, 255, 0.3);
   --hero-ink: #e6e0f2;
   --hero-muted: #b6aec6;
   --hero-accent: #a98bff;
@@ -779,7 +782,29 @@ a.card:hover {
   inset: 0;
   width: 100%;
   height: 100%;
-  transition: opacity 0.45s ease;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.scenes.ready canvas {
+  opacity: 1;
+}
+
+html[data-nofade] .scenes canvas {
+  transition: none;
+}
+
+/* Shown at once, before the script has drawn the first frame. */
+.scenes--hero {
+  background-image: repeating-radial-gradient(
+    circle at 72% 54%,
+    transparent 0,
+    transparent 8rem,
+    var(--ring) 8rem,
+    var(--ring) calc(8rem + 2px),
+    transparent calc(8rem + 2px),
+    transparent 15rem
+  );
 }
 
 .scenes-snap {

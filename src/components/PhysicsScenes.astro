@@ -62,7 +62,7 @@ const labels: Record<SceneId, string> = {
   // time, so a theme change only needs a redraw.
   const PAL = {
     dark: {
-      bg: [11, 9, 17], inkRGB: "226,220,242", panelRGB: "14,11,20",
+      bg: [11, 9, 17], core: [11, 9, 17], inkRGB: "226,220,242", panelRGB: "14,11,20",
       ringLo: [140, 104, 240], ringHi: [226, 160, 190],
       poly: { Fe: [224, 172, 112], Zn: [196, 200, 222], Mg: [152, 122, 240] },
       alpha: { Fe: 0.5, Zn: 0.7, Mg: 0.7 }, oxy: [210, 84, 118],
@@ -75,23 +75,23 @@ const labels: Record<SceneId, string> = {
       sheenA: "rgba(255,255,255,0.08)", sheenB: "rgba(169,139,255,0.07)",
       lensEdge: "rgba(226,220,242,0.7)", lensInner: "rgba(169,139,255,0.35)",
       axisLine: "rgba(196,170,255,0.95)", axisText: "rgba(196,180,255,0.95)",
-      curRGB: "244,186,104", fieldRGB: "176,150,255", slab: "rgba(226,220,242,0.4)",
+      curRGB: "244,186,104", fieldRGB: "176,150,255", forceRGB: "246,120,160", slab: "rgba(226,220,242,0.4)",
     },
     light: {
-      bg: [217, 204, 168], inkRGB: "42,31,24", panelRGB: "217,204,168",
-      ringLo: [200, 110, 40], ringHi: [96, 30, 34],
-      poly: { Fe: [184, 98, 36], Zn: [62, 118, 98], Mg: [90, 66, 142] },
-      alpha: { Fe: 0.6, Zn: 0.72, Mg: 0.72 }, oxy: [130, 34, 46],
+      bg: [217, 204, 168], core: [26, 24, 66], inkRGB: "42,31,24", panelRGB: "217,204,168",
+      ringLo: [78, 128, 196], ringHi: [20, 40, 110],
+      poly: { Fe: [200, 146, 36], Zn: [46, 98, 170], Mg: [172, 50, 50] },
+      alpha: { Fe: 0.62, Zn: 0.72, Mg: 0.72 }, oxy: [74, 44, 32],
       polyEdge: "rgba(42,31,24,0.32)", gloss: "rgba(255,255,255,0.45)",
-      vortA: [36, 82, 68], vortB: [200, 112, 40],
-      weyl: ["rgba(112,32,40,0.8)", "rgba(24,70,56,0.85)", "rgba(168,76,12,0.95)"],
-      weylFade: "rgba(217,204,168,0.05)", weylGlow: "184,92,24", weylAxis: "rgba(70,54,40,0.75)",
+      vortA: [30, 84, 170], vortB: [236, 180, 44],
+      weyl: ["rgba(170,36,36,0.8)", "rgba(30,80,160,0.85)", "rgba(196,132,12,0.95)"],
+      weylFade: "rgba(217,204,168,0.05)", weylGlow: "196,132,12", weylAxis: "rgba(70,54,40,0.75)",
       weylNode: "rgba(42,31,24,0.95)",
-      pixel: [34,58,48],
-      sheenA: "rgba(255,255,255,0.35)", sheenB: "rgba(47,90,74,0.08)",
-      lensEdge: "rgba(42,31,24,0.85)", lensInner: "rgba(47,90,74,0.4)",
-      axisLine: "rgba(128,40,44,0.95)", axisText: "rgba(128,40,44,0.95)",
-      curRGB: "128,40,44", fieldRGB: "36,72,59", slab: "rgba(42,31,24,0.45)",
+      pixel: [30, 62, 140],
+      sheenA: "rgba(255,255,255,0.35)", sheenB: "rgba(30,80,160,0.08)",
+      lensEdge: "rgba(42,31,24,0.85)", lensInner: "rgba(30,80,160,0.4)",
+      axisLine: "rgba(170,36,36,0.95)", axisText: "rgba(170,36,36,0.95)",
+      curRGB: "30,76,160", fieldRGB: "250,236,196", forceRGB: "176,40,40", slab: "rgba(42,31,24,0.45)",
     },
   };
   let T = PAL.dark;
@@ -525,9 +525,9 @@ const labels: Record<SceneId, string> = {
           }
           const m = 0.5 + 0.5 * Math.cos(phase); // 0 → violet, 1 → silver
           const s = amp * amp, o = (j * gw + i) * 4;
-          d[o] = BG[0] + (T.vortA[0] + (T.vortB[0] - T.vortA[0]) * m - BG[0]) * s;
-          d[o + 1] = BG[1] + (T.vortA[1] + (T.vortB[1] - T.vortA[1]) * m - BG[1]) * s;
-          d[o + 2] = BG[2] + (T.vortA[2] + (T.vortB[2] - T.vortA[2]) * m - BG[2]) * s;
+          d[o] = T.core[0] + (T.vortA[0] + (T.vortB[0] - T.vortA[0]) * m - T.core[0]) * s;
+          d[o + 1] = T.core[1] + (T.vortA[1] + (T.vortB[1] - T.vortA[1]) * m - T.core[1]) * s;
+          d[o + 2] = T.core[2] + (T.vortA[2] + (T.vortB[2] - T.vortA[2]) * m - T.core[2]) * s;
           d[o + 3] = 255;
         }
       }
@@ -712,7 +712,7 @@ const labels: Record<SceneId, string> = {
           const u = (dx * ca + dy * sa) / (A * R), v = (-dx * sa + dy * ca) / (B * R);
           const q = u * u + v * v;
           const inside = q < 1;
-          const taper = inside ? Math.min(1, (1 - q) / 0.1) : 0;
+          const tq = inside ? Math.min(1, (1 - q) / 0.4) : 0, taper = tq * tq * (3 - 2 * tq);
           const o = (j * gw + i) * 4;
           for (let c = 0; c < 3; c++) {
             let sx = x, sy = y;
@@ -943,9 +943,9 @@ const labels: Record<SceneId, string> = {
             phase += st.s * atan2(dy, dx);
           }
           const m = 0.5 + 0.5 * Math.cos(phase), a2 = amp * amp;
-          d[o] = BG[0] + (T.vortA[0] + (T.vortB[0] - T.vortA[0]) * m - BG[0]) * a2;
-          d[o + 1] = BG[1] + (T.vortA[1] + (T.vortB[1] - T.vortA[1]) * m - BG[1]) * a2;
-          d[o + 2] = BG[2] + (T.vortA[2] + (T.vortB[2] - T.vortA[2]) * m - BG[2]) * a2;
+          d[o] = T.core[0] + (T.vortA[0] + (T.vortB[0] - T.vortA[0]) * m - T.core[0]) * a2;
+          d[o + 1] = T.core[1] + (T.vortA[1] + (T.vortB[1] - T.vortA[1]) * m - T.core[1]) * a2;
+          d[o + 2] = T.core[2] + (T.vortA[2] + (T.vortB[2] - T.vortA[2]) * m - T.core[2]) * a2;
           d[o + 3] = 255;
         }
       }
@@ -1005,6 +1005,28 @@ const labels: Record<SceneId, string> = {
           const [a, b] = P(k, v.x, v.y, 0), [c, e] = P(k, v.x, v.y, Lz);
           ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(c, e); ctx.stroke();
         }
+        // Lorentz force F = J × B on each vortex (pointing across the sample).
+        ctx.strokeStyle = `rgba(${T.forceRGB},0.95)`; ctx.fillStyle = `rgba(${T.forceRGB},0.95)`; ctx.lineWidth = 2.2;
+        for (const v of st.vs) {
+          const [a, b] = P(k, v.x, v.y, 0), b2 = b - 2.6 * sc;
+          ctx.beginPath(); ctx.moveTo(a, b - 6); ctx.lineTo(a, b2); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(a, b2 - 3); ctx.lineTo(a - 4.5, b2 + 5); ctx.lineTo(a + 4.5, b2 + 5); ctx.closePath(); ctx.fill();
+        }
+        // Field B: an arrow out of the front face, towards the viewer.
+        {
+          const [bx, by] = P(k, 3.4, Ly - 2.6, 0), [ex, ey] = P(k, 3.4, Ly - 2.6, -4.6);
+          const ang = Math.atan2(ey - by, ex - bx);
+          // Outline first, so the arrow reads over any part of the map.
+          ctx.strokeStyle = `rgba(${T.panelRGB},0.9)`; ctx.lineWidth = 6;
+          ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(ex, ey); ctx.stroke();
+          ctx.strokeStyle = `rgba(${T.fieldRGB},1)`; ctx.fillStyle = `rgba(${T.fieldRGB},1)`; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(ex, ey); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(ex, ey);
+          ctx.lineTo(ex - 8 * Math.cos(ang - 0.45), ey - 8 * Math.sin(ang - 0.45));
+          ctx.lineTo(ex - 8 * Math.cos(ang + 0.45), ey - 8 * Math.sin(ang + 0.45));
+          ctx.closePath(); ctx.fill();
+          ctx.textAlign = "left"; txt(ctx, "B", ex - 14, ey + 14, 0.95); ctx.textAlign = "center";
+        }
         // Current arrow above the slab, counters below.
         const [tx0, ty0] = P(k, 0.15 * Lx, Ly, Lz), [tx1] = P(k, 0.85 * Lx, Ly, Lz), yar = ty0 - 14, dir = st.s;
         const aS = dir > 0 ? tx0 : tx1, aE = dir > 0 ? tx1 : tx0;
@@ -1021,13 +1043,13 @@ const labels: Record<SceneId, string> = {
       ctx.font = `11px "IBM Plex Mono", monospace`;
       if (!(w < 560)) {
         const lx = 14, ly = 22;
-        txt(ctx, "⊙  field B, out of the page", lx, ly, 0.9);
+        txt(ctx, "B  field, out of the page (arrow)", lx, ly, 0.9);
         ctx.strokeStyle = `rgba(${T.curRGB},0.9)`; ctx.lineWidth = 1.6; ctx.setLineDash([6, 5]);
         ctx.beginPath(); ctx.moveTo(lx, ly + 16); ctx.lineTo(lx + 20, ly + 16); ctx.stroke(); ctx.setLineDash([]);
         txt(ctx, "current lines (crowd at the tip)", lx + 28, ly + 20, 0.9);
         ctx.strokeStyle = `rgba(${T.inkRGB},0.9)`; ctx.lineWidth = 2.2;
         ctx.beginPath(); ctx.moveTo(lx + 8, ly + 30); ctx.lineTo(lx + 14, ly + 38); ctx.stroke();
-        txt(ctx, "vortex line through the thickness", lx + 28, ly + 40, 0.9);
+        txt(ctx, "vortex line · Lorentz force F = J × B", lx + 28, ly + 40, 0.9);
       }
       ctx.restore();
       const rp = rateOf(strips[0]), rm = rateOf(strips[1]);
@@ -1135,6 +1157,7 @@ const labels: Record<SceneId, string> = {
       scenes.forEach((s) => s.resize(w, h));
       scenes[cur].reset(ctx);
       scenes[cur].settle(ctx);
+      root.classList.add("ready");
     }
 
     function loop(now: number) {
