@@ -218,7 +218,7 @@ export const cv = {
     { role: "Administrative and Technical Assistant", org: "National Astronomical Observatory, Universidad Nacional de Colombia", when: "2023–2026" },
     { role: "Extension and Technology-Transfer Assistant", org: "Department of Physics, Universidad Nacional de Colombia", when: "2024–2025" },
     { role: "Academic and Scientific Support", org: "Universidad Nacional de Colombia", when: "2022–2025" },
-    { role: "Customer Operations", org: "Iké Asistencia", when: "2018" },
+    { role: "Customer Operations", org: "Iké Asistencia", when: "2023" },
   ],
   education: [
     { what: "B.Sc. Physics", where: "Universidad Nacional de Colombia, Bogotá", when: "2019 – 2026", note: "Degree conferred 5 November 2026. Bachelor's thesis in experimental materials physics (grade 5.0/5.0). GPA 4.0/5.0." },
