@@ -205,6 +205,10 @@ const labels: Record<SceneId, string> = {
     "MgFe₂O₄ · inverse spinel, δ ≈ 0.9",
   ];
 
+  // Width of the (311) reflection in the fit: the clearest change between the three patterns.
+  const fwhm311 = (s: { peaks: [number, number, number][] }) =>
+    s.peaks.reduce((b, p) => (Math.abs(p[0] - 35.4) < 0.3 && p[2] > b[2] ? p : b), [0, 0, 0] as [number, number, number])[1];
+
   function crystalScene(hero: boolean): Scene {
     const f = makeField(hero ? 3 : 2);
     let cx = 0, cy = 0, D = 0, L = 0, which = 1, prev = 1, held = 0, blend = 1;
@@ -236,17 +240,25 @@ const labels: Record<SceneId, string> = {
       const prof = new Float32Array(Math.ceil(rmax / dr) + 2);
       for (let k = 0; k < prof.length; k++) {
         const r = k * dr;
-        const tth = (Math.atan(r / D) * 180) / Math.PI;
-        // Display floor on the width: a ring must span at least ~1.5 cells.
-        const pxPerDeg = (D * (Math.PI / 180)) / Math.cos((tth * Math.PI) / 180) ** 2;
-        const floor = (1.5 * cell) / pxPerDeg;
-        let I = 0.6;
-        for (const [p, w, a] of sample.peaks) {
-          const fw = Math.sqrt(w * w + floor * floor);
-          const u = (tth - p) / (fw / 2);
-          I += a * (0.5 / (1 + u * u) + 0.5 * Math.exp(-0.693 * u * u));
+        // Each display cell integrates the intensity over its own width, as a
+        // detector pixel does, so that the measured widths (0.24–0.34°) are not
+        // hidden by a display floor: a narrower peak is a thinner, sharper ring.
+        const sub = Math.max(1, Math.round(cell / dr));
+        let acc = 0;
+        for (let q = 0; q < sub; q++) {
+          const rq = r + (q + 0.5 - sub / 2) * dr;
+          const tth = (Math.atan(Math.max(rq, 0) / D) * 180) / Math.PI;
+          const pxPerDeg = (D * (Math.PI / 180)) / Math.cos((tth * Math.PI) / 180) ** 2;
+          const floor = (0.4 * cell) / pxPerDeg; // small floor: the ring never vanishes between samples
+          let I = 0.6;
+          for (const [p, w, a] of sample.peaks) {
+            const fw = Math.sqrt(w * w + floor * floor);
+            const u = (tth - p) / (fw / 2);
+            I += a * (0.5 / (1 + u * u) + 0.5 * Math.exp(-0.693 * u * u));
+          }
+          acc += I;
         }
-        prof[k] = r < 0.03 * f.h ? 0 : I; // beam stop
+        prof[k] = r < 0.03 * f.h ? 0 : acc / sub; // beam stop
       }
       const rate = new Float32Array(gw * gh);
       let peak = 0;
@@ -408,7 +420,8 @@ const labels: Record<SceneId, string> = {
         const x = cx + r * Math.cos(up) + 5, y = cy - r * Math.sin(up) - 5;
         if (x < f.w - 28) ctx.fillText(hkl, x, y);
       }
-      const s = SAMPLES[which];
+      const shown = blend < 0.5 ? prev : which;
+      const s = SAMPLES[shown];
       const y0 = cy + 1.0 * L;
       const line = (text: string, y: number, size: number, alpha: number) => {
         ctx.font = `${size}px "IBM Plex Mono", monospace`;
@@ -419,8 +432,8 @@ const labels: Record<SceneId, string> = {
         ctx.fillText(text, cx, y);
       };
       ctx.textAlign = "center";
-      line(CELL_LABEL[which], y0, hero ? 12 : 11, 0.95);
-      line(`Rings: measured pattern, a = ${s.a} Å`, y0 + 20, hero ? 11 : 10, 0.8);
+      line(CELL_LABEL[shown], y0, hero ? 12 : 11, 0.95);
+      line(`Rings: measured · a = ${s.a} Å · FWHM(311) = ${fwhm311(s).toFixed(2)}°`, y0 + 20, hero ? 11 : 10, 0.8);
       ctx.textAlign = "left";
       ctx.font = `${hero ? 11 : 10}px "IBM Plex Mono", monospace`;
       const legend: [string, number[]][] = [["Fe", POLY.Fe], ["Zn", POLY.Zn], ["Mg", POLY.Mg], ["O", OXY]];
@@ -735,7 +748,7 @@ const labels: Record<SceneId, string> = {
               const g = 0.5 + 0.5 * Math.cos(6.2832 * (sx * 0.955 + sy * 0.296) / (2.6 * pitch) - t * 2.4);
               val = g * g;
             }
-            d[o + c] = BG[c] + val * (T.pixel[c] - BG[c]) * (inside ? 0.85 : 0.6);
+            d[o + c] = BG[c] + val * (T.pixel[c] - BG[c]) * (inside ? 0.85 : pattern === 1 ? 0.34 : 0.6);
           }
           d[o + 3] = 255;
         }
@@ -824,7 +837,7 @@ const labels: Record<SceneId, string> = {
 
     return {
       caption:
-        "The lensmeter set-up: a pattern on a screen seen through a spectacle lens with sphere and cylinder, its axis turning slowly. The lens displaces the pattern according to its power — uniformly for the sphere, along one direction for the cylinder. Phase-shifting fringes, as used in deflectometry, make the displacement measurable at every point; the arrows show it, and the readout is the prescription it implies at a lens–screen distance of 28 cm. Moving the pointer over the panel moves the lens.",
+        "The lensmeter set-up: a pattern on a screen seen through a spectacle lens with sphere and cylinder, its axis turning slowly. The lens displaces the pattern according to its power — uniformly for the sphere, along one direction for the cylinder. Phase-shifting fringes, as used in deflectometry, cover the whole screen and make the displacement measurable at every point — outside the lens they stay straight, inside it they bend; the arrows show it, and the readout is the prescription it implies at a lens–screen distance of 28 cm. Moving the pointer over the panel moves the lens.",
       resize(nw, nh) {
         w = nw; h = nh; f.resize(w, h);
         pitch = Math.max(10, Math.min(18, h / 34));
@@ -1055,7 +1068,8 @@ const labels: Record<SceneId, string> = {
       ctx.restore();
       const rp = rateOf(strips[0]), rm = rateOf(strips[1]);
       const nr = rp + rm > 0 ? (rp - rm) / (rp + rm) : 0;
-      readout(ctx, w, hero, rp && rm ? `voltage non-reciprocity ≈ ${(100 * nr).toFixed(0)} %` : "measuring…");
+      const rgn = REGIMES[regime];
+      readout(ctx, w, hero, rp && rm ? `voltage non-reciprocity ≈ ${(100 * nr).toFixed(0)} % · tip wait ${rgn.wp.toFixed(1)} vs ${rgn.wm.toFixed(1)}` : "measuring…");
     }
 
     return {

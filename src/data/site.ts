@@ -65,7 +65,7 @@ export const solver = {
     { tag: "v13.3", what: "Octave reference implementation (hash df37e31c), the origin of the stored reference states." },
     { tag: "v14.1", what: "Julia port, bit for bit against v13.3, with an optional scalar potential by Coulomb projection." },
     { tag: "1.0", what: "juliaTDGL, public release (MIT, October 2026): optional terms for interband drag, heating, Joule dissipation and bath temperature, all off by default; a Strict mode that reproduces the reference bit for bit and a Fast mode; a terminal menu for runs and a browser editor for 3D sample shapes." },
-    { tag: "1.1", what: "In development: an implicit treatment of the Maxwell step, which removes the time-step limit of strongly screened samples, and a 3D view of the sample geometry." },
+    { tag: "1.1", what: "An implicit treatment of the curl-curl term, which removes the Maxwell limit on the time step of strongly screened samples, and sub-stepping of the stiff band; validated against the explicit scheme (onset brackets identical, flowing voltages within 0.2 %), about 3 times faster per unit time at κ = 2 and about 100 times at κ = 25. The explicit scheme remains the default, so published numbers reproduce." },
   ],
   validation: [
     "Bit-for-bit agreement with the stored reference states (maximum difference 0 on 32 arrays).",
@@ -218,7 +218,7 @@ export const cv = {
     { role: "Administrative and Technical Assistant", org: "National Astronomical Observatory, Universidad Nacional de Colombia", when: "2023–2026" },
     { role: "Extension and Technology-Transfer Assistant", org: "Department of Physics, Universidad Nacional de Colombia", when: "2024–2025" },
     { role: "Academic and Scientific Support", org: "Universidad Nacional de Colombia", when: "2022–2025" },
-    { role: "Customer Operations", org: "Iké Asistencia and prior roles", when: "2018–2023" },
+    { role: "Customer Operations", org: "Iké Asistencia", when: "2018" },
   ],
   education: [
     { what: "B.Sc. Physics", where: "Universidad Nacional de Colombia, Bogotá", when: "2019 – 2026", note: "Degree conferred 5 November 2026. Bachelor's thesis in experimental materials physics (grade 5.0/5.0). GPA 4.0/5.0." },
