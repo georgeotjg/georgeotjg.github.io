@@ -25,7 +25,7 @@ export const site = {
 };
 
 export const intro =
-  "Experimental physicist working on oxide materials and on the simulation of superconductors. Author of juliaTDGL, an open-source three-dimensional two-band Ginzburg–Landau solver; currently also on first-principles nonlinear optics of Weyl semimetals.";
+  "Experimental physicist working on oxide materials and on the simulation of superconductors. Author of juliaTDGL, an open-source three-dimensional multiband Ginzburg–Landau solver; currently also on first-principles nonlinear optics of Weyl semimetals.";
 
 export const introMore =
   "Interests: vortex matter and multiband superconductivity, structure–property relations in functional oxides, and light–matter response from first principles — with measurements and simulations checked against each other.";
@@ -38,8 +38,8 @@ export const numbers = [
 ];
 
 export const now = [
-  "Methods paper on silent failure modes in 3D two-band TDGL simulation, published as a preprint on Zenodo (October 2026), with the open-source solver juliaTDGL 1.0.",
-  "The geometric diode at MgB₂-like parameters — strong screening and separated coherence lengths — with Joule heating and interband drag; next, multiband and non-equilibrium TDGL for three-dimensional nanostructures.",
+  "Methods paper on silent failure modes in 3D two-band TDGL simulation, published as a preprint on Zenodo (October 2026), with the open-source solver juliaTDGL.",
+  "The geometric diode at MgB₂-like parameters — strong screening and separated coherence lengths — with Joule heating, interband drag and finite interband quasiparticle exchange; release 2.0 of juliaTDGL extends the solver to N bands for three-dimensional nanostructures. Two further manuscripts in preparation.",
   "Nonlinear optics of Weyl semimetals from first principles: a validated real-time model, and a Quantum ESPRESSO → Wannier90 chain under way.",
   "An open computational lensmeter built from a phone camera and a laptop screen (design stage).",
 ];
@@ -60,12 +60,14 @@ export const thesis = {
 
 export const solver = {
   summary:
-    "A three-dimensional, two-band time-dependent Ginzburg–Landau solver for mesoscopic superconductors under applied field and transport current, designed, written and validated independently. Two order parameters coupled by a Josephson term and a self-consistent vector potential on a staggered mesh with gauge-invariant link variables; the current is injected through its own Ampère field, and the voltage is read from the Josephson relation on the gauge-invariant phase. Released as open source.",
+    "A three-dimensional, two-band time-dependent Ginzburg–Landau solver for mesoscopic superconductors under applied field and transport current, designed, written and validated independently. Two order parameters coupled by a Josephson term and a self-consistent vector potential on a staggered mesh with gauge-invariant link variables; the current is injected through its own Ampère field, and the voltage is read from the Josephson relation on the gauge-invariant phase. Released as open source, in a two-band release (1.2) and an N-band one (2.0).",
   versions: [
     { tag: "v13.3", what: "Octave reference implementation (hash df37e31c), the origin of the stored reference states." },
     { tag: "v14.1", what: "Julia port, bit for bit against v13.3, with an optional scalar potential by Coulomb projection." },
     { tag: "1.0", what: "juliaTDGL, public release (MIT, October 2026): optional terms for interband drag, heating, Joule dissipation and bath temperature, all off by default; a Strict mode that reproduces the reference bit for bit and a Fast mode; a terminal menu for runs and a browser editor for 3D sample shapes." },
-    { tag: "1.1", what: "An implicit treatment of the curl-curl term, which removes the Maxwell limit on the time step of strongly screened samples, and sub-stepping of the stiff band; validated against the explicit scheme (onset brackets identical, flowing voltages within 0.2 %), about 3 times faster per unit time at κ = 2 and about 100 times at κ = 25. The explicit scheme remains the default, so published numbers reproduce." },
+    { tag: "1.1", what: "An implicit treatment of the curl-curl term, which removes the Maxwell limit on the time step of strongly screened samples, and sub-stepping of the stiff band; validated against the explicit scheme (onset brackets identical, flowing voltages within 0.2 %), about 3 times faster per unit time at κ = 2 and about 100 times at κ = 25. The explicit scheme remains available, so published numbers reproduce." },
+    { tag: "1.2", what: "Same results as 1.1. The production scheme (implicit field, explicit bands with sub-steps) is the default, checkpoints are compressed and exact, and the terminal menu and the shape-editor server are written in Julia; a legacy configuration reproduces 1.0.0 to the digit." },
+    { tag: "2.0", what: "N-band release: a Josephson matrix, Kramer–Watts-Tobin relaxation per band, optional finite interband exchange of quasiparticles, anisotropic bands, thermal noise, an open self-field boundary, an insulating buffer, sculpted samples and the onset by the delay of the first phase slip; runs from parameter files, stopped and resumed to the bit. With its new terms off it reproduces 1.2." },
   ],
   validation: [
     "Bit-for-bit agreement with the stored reference states (maximum difference 0 on 32 arrays).",
@@ -160,9 +162,9 @@ export const optics = {
 export const software = [
   {
     kicker: "Open source · Julia",
-    title: "juliaTDGL — 3D two-band TDGL solver",
+    title: "juliaTDGL — 3D multiband TDGL solvers",
     body:
-      "The solver of the methods paper, released under MIT: kernel threaded over planes, optional physics behind switches, checkpoint and restart, VTK export for ParaView, a guide to the physics and the numerics, and about 56 000 test assertions including bit-for-bit acceptance against reference states.",
+      "Two releases under MIT. Release 1.2 is the two-band solver of the methods paper, with about 56 000 test assertions including bit-for-bit acceptance against reference states; release 2.0 generalises it to N bands, with its own test suite. Both have optional physics behind switches, checkpoint and restart, VTK export for ParaView, a terminal menu, a browser editor for sample shapes and a guide to the physics and the numerics.",
     tags: ["Julia", "Octave/MATLAB", "Python", "ParaView", "Lean 4"],
     link: "https://github.com/georgeotjg/juliaTDGL",
   },
