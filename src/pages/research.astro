@@ -2,7 +2,7 @@
 import Base from "../layouts/Base.astro";
 import PhysicsScenes from "../components/PhysicsScenes.astro";
 import Toc from "../components/Toc.astro";
-import { solver, paper, findings, figuresPaper, weyl, optics, site } from "../data/site";
+import { solver, paper, findings, figuresPaper, figuresSolver, weyl, optics, site } from "../data/site";
 ---
 
 <Base
@@ -53,6 +53,20 @@ import { solver, paper, findings, figuresPaper, weyl, optics, site } from "../da
       <ul class="points">
         {solver.validation.map((v) => <li>{v}</li>)}
       </ul>
+
+      <h3 id="solver-figs" style="margin-top:1.8rem">The solver at work</h3>
+      <div class="figs three">
+        {
+          figuresSolver.map((fig) => (
+            <figure>
+              <a href={fig.src} target="_blank" rel="noopener">
+                <img src={fig.src} alt={fig.alt} loading="lazy" />
+              </a>
+              <figcaption>{fig.caption}</figcaption>
+            </figure>
+          ))
+        }
+      </div>
 
       <h3 id="paper1" style="margin-top:2rem">Methods paper</h3>
       <p class="paper-title"><a href={site.paperDoi}>{paper.title}</a></p>

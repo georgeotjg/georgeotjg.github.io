@@ -715,6 +715,9 @@ a.card:hover {
   .figs.two {
     grid-template-columns: 1fr 1fr;
   }
+  .figs.three {
+    grid-template-columns: 1.15fr 1fr 1fr;
+  }
 }
 
 .figs figure {

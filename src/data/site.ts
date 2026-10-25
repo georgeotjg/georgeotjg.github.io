@@ -133,6 +133,24 @@ export const figuresPaper = [
   },
 ];
 
+export const figuresSolver = [
+  {
+    src: "/figs/solver_vortex.gif",
+    alt: "Animation of the order-parameter density of a notched two-band box at plus and minus current: vortices enter at the tip of the notch for one sign and almost none for the other",
+    caption: "Two-band notched box, |Ψσ|² on the mid-plane at H = 0.03 H_c2 and |J| = 0.44: for +J (top) vortices enter at the tip of the notch and cross; for −J (bottom), at the same current, almost none do.",
+  },
+  {
+    src: "/figs/solver_editor_cable.png",
+    alt: "Screenshot of the three-dimensional shape editor showing a cable-like sample with a groove along its length, the applied field and the current",
+    caption: "The shape editor of release 2.0: a cable-like sample with a groove, with the transport current J, the field H and the faces where vortices enter.",
+  },
+  {
+    src: "/figs/solver_editor_slabs.png",
+    alt: "Screenshot of the shape editor showing three stacked slabs separated by vacuum, with the current along the slabs and the field across them",
+    caption: "Three stacked slabs with vacuum between them, drawn in the same editor: the sample is a shape in three dimensions, not a strip.",
+  },
+];
+
 export const weyl = {
   status: "Started September 2026",
   summary:
