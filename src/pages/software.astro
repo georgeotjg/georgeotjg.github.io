@@ -27,6 +27,11 @@ import { software, practices } from "../data/site";
                 <a href={p.link}>{p.link.replace("https://", "")}</a>
               </p>
             )}
+            {p.docs && (
+              <p>
+                Documentation: <a href={p.docs}>{p.docs.replace("https://", "")}</a>
+              </p>
+            )}
             <ul class="tags">
               {p.tags.map((t) => <li>{t}</li>)}
             </ul>

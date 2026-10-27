@@ -185,6 +185,7 @@ export const software = [
       "Two releases under MIT. Release 1.2 is the two-band solver of the methods paper, with about 56 000 test assertions including bit-for-bit acceptance against reference states; release 2.0 generalises it to N bands, with its own test suite. Both have optional physics behind switches, checkpoint and restart, VTK export for ParaView, a terminal menu, a browser editor for sample shapes and a guide to the physics and the numerics.",
     tags: ["Julia", "Octave/MATLAB", "Python", "ParaView", "Lean 4"],
     link: "https://github.com/georgeotjg/juliaTDGL",
+    docs: "https://georgeotjg.github.io/juliaTDGL/",
   },
   {
     kicker: "Tools · JavaScript, Python",
