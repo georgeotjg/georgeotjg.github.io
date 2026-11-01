@@ -40,8 +40,8 @@ export const numbers = [
 export const now = [
   "Methods paper on silent failure modes in 3D two-band TDGL simulation, published as a preprint on Zenodo (October 2026), with the open-source solver juliaTDGL.",
   "The geometric diode at MgB₂-like parameters — strong screening and separated coherence lengths — with Joule heating, interband drag and finite interband quasiparticle exchange; release 2.0 of juliaTDGL extends the solver to N bands for three-dimensional nanostructures. Two further manuscripts in preparation.",
-  "Nonlinear optics of Weyl semimetals from first principles: a validated real-time model, and a Quantum ESPRESSO → Wannier90 chain under way.",
-  "An open computational lensmeter built from a phone camera and a laptop screen (design stage).",
+  "Nonlinear optics of Weyl semimetals from first principles: a validated real-time model, and a Quantum ESPRESSO → Wannier90 → Julia chain that reproduces GaAs and TaAs against the literature.",
+  "An open computational lensmeter built from a phone camera and a laptop screen: a virtual optical bench simulates the photographs and the inverse solver recovers the prescription within ±0.12 D (simulation; no real photographs yet).",
 ];
 
 export const thesis = {
@@ -151,8 +151,29 @@ export const figuresSolver = [
   },
 ];
 
+export const figuresWeyl = [
+  {
+    src: "/figs/taas_nodes.gif",
+    alt: "Rotating view of the Brillouin zone of TaAs with its 24 Weyl nodes coloured by node family and chirality",
+    caption: "TaAs as a computational test bed: the 24 Weyl nodes of the Wannier model (PBE+SOC), coloured by family and chirality; positions agree with Weng et al. (2015) to about 1 %.",
+  },
+  {
+    src: "/figs/taas_gap.gif",
+    alt: "Map of the band gap between the two bands that cross at the Weyl nodes of TaAs, on a logarithmic scale, as the plane in k-space is moved along kz",
+    caption: "Gap between the two crossing bands on planes of constant k_z (logarithmic scale, 1–2000 meV): the dark spots are where the plane passes near a node.",
+  },
+];
+
+export const figuresOptics = [
+  {
+    src: "/figs/bench_distance.gif",
+    alt: "Simulated photographs of a crossed fringe pattern seen through a positive spectacle lens as the lens is moved away from the screen",
+    caption: "Virtual optical bench: simulated photographs of the screen pattern through a +3.00 D spectacle lens as the lens–screen distance grows. No real photographs have been analysed yet.",
+  },
+];
+
 export const weyl = {
-  status: "Started September 2026",
+  status: "Started 2026",
   summary:
     "How do shift and injection photocurrents and second-harmonic generation in magnetic Weyl semimetals depend on the treatment of the f electrons and on the direction of the magnetization, and where does perturbation theory stop being sufficient? Guiding rule: reproduce the measured linear optical conductivity before trusting any nonlinear prediction.",
   stack: "Quantum ESPRESSO + Wannier90 + Julia for the dense-k work; Octopus real-time TDDFT as the self-consistent reference; Python for analysis and for separating shift from injection currents in j(t).",
@@ -161,8 +182,11 @@ export const weyl = {
     "Octopus real-time TDDFT validated on silicon, including a symmetry null test: a zero-area pulse leaves no DC current, as inversion requires.",
     "Quantum ESPRESSO → Wannier90 chain for GaAs running, with band energies reproduced at high-symmetry points — the starting point for the shift-current benchmark.",
     "Interactions in the model: a local mean field barely changes the quantized response, while a non-local exchange term breaks it already at first order.",
+    "Shift current of GaAs reproduced against the literature (plateau 14–16 and peak 37 µA/V² against about 16 and 42), with the overall sign fixed independently by a real-time Wannier propagator that agrees within 1–2 %.",
+    "TaAs as a computational test bed: the 24 Weyl nodes with positions matching Weng et al. (2015) to about 1 %, the break in the slope of the linear optical conductivity near 28 meV as in Xu et al. (2016), and a shift current of about 180 µA/V² at 117 meV against 154 ± 17 µA/V² measured by Osterhoudt et al. (2019).",
+    "Own tools, each checked against an independent calculation: shift current by exact sum over states, real-time propagation in a Wannier basis, and Weyl-node finding with chirality, with adaptive k-meshes.",
   ],
-  next: "Shift current of GaAs against the literature, then a measured Weyl semimetal.",
+  next: "A Wannier model of a control compound of the magnetic family, then the f-electron question.",
 };
 
 export const optics = {
@@ -173,8 +197,11 @@ export const optics = {
   done: [
     "Simulation: a thin-lens estimate at 5 cm is biased by 0.13–0.34 D on real spectacle lenses; a two-surface model fitted at three distances brings the bias below 0.005 D.",
     "Core inverse solver checked numerically on a curved domain (error 4 × 10⁻¹¹ in 24 preconditioned iterations).",
+    "A virtual optical bench now simulates the photographs end to end — screen, two-surface lens, a phone camera with sensor noise, quantization and rolling shutter — and passes them to the same inverse solver that will analyse real photographs.",
+    "In simulation, two surfaces fitted at three distances recover sphere, cylinder and axis within the ISO tolerance of ±0.12 D in every case tested, with the phone rotated freely and without a tripod (self-referencing by homography); hand tremor of 0.2° raises the error to about 0.08 D and larger motion triggers an alarm.",
+    "Twenty unit tests check the pieces against known physical and mathematical properties. What is not yet tested: that the phone's RAW data are linear, and the whole method on a real lens — the central, falsifiable prediction of the project.",
   ],
-  next: "Characterize the sensor and the screen, validate on a synthetic lens, then measure several spectacle lenses against an optician's lensmeter.",
+  next: "Characterize the phone sensor and the screen, then measure a few spectacle lenses against an optician's lensmeter.",
 };
 
 export const software = [

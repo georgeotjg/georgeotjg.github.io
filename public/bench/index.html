@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Virtual optical bench — simulated</title>
+<style>
+:root{--bg:#f6f5f1;--fg:#1c1c1a;--mut:#6b6b66;--ac:#b5541c;--card:#ffffff;--bd:#dcdad3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121212;--fg:#ececec;--mut:#9a9a9a;--ac:#ec9a63;--card:#1d1d1d;--bd:#323232}}
+:root[data-theme="dark"]{--bg:#121212;--fg:#ececec;--mut:#9a9a9a;--ac:#ec9a63;--card:#1d1d1d;--bd:#323232}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,sans-serif}
+header{padding:12px 16px;border-bottom:1px solid var(--bd)}
+h1{font-size:18px;margin:0}
+.tag{display:inline-block;border:1px solid var(--ac);color:var(--ac);padding:1px 8px;border-radius:12px;font-size:11px;margin-left:8px}
+.sub{color:var(--mut);font-size:12px}
+main{display:grid;grid-template-columns:1fr 1fr 290px;gap:12px;padding:12px 16px}
+@media (max-width:1000px){main{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:8px;min-width:0}
+.panel h2{font-size:13px;margin:2px 4px 6px;color:var(--mut);font-weight:600}
+#v3d,#cam{width:100%;aspect-ratio:1/1;display:block;border-radius:6px;background:#000}
+label{display:block;font-size:12px;margin-top:8px}
+label span{float:right;font-variant-numeric:tabular-nums;color:var(--ac)}
+input[type=range]{width:100%}
+.big{font-size:20px;font-weight:600;margin:6px 0}
+.mut{color:var(--mut);font-size:12px}
+button{background:transparent;border:1px solid var(--bd);color:var(--fg);border-radius:6px;padding:4px 8px;cursor:pointer;margin:2px}
+</style>
+</head>
+<body>
+<header>
+<h1>Virtual optical bench — deflectometric lensmeter<span class="tag">SIMULATED · design stage</span></h1>
+<div class="sub">Laptop screen (crossed pattern) → spectacle lens → phone camera. Exact ray tracing (Snell, two surfaces) on the GPU. Everything here is simulated; no real photographs have been analysed yet.</div>
+</header>
+<main>
+<section class="panel"><h2>3D bench — free camera: drag = orbit, wheel = zoom, right click = pan</h2><canvas id="v3d"></canvas></section>
+<section class="panel"><h2>What the sensor sees (central crop)</h2><canvas id="cam"></canvas>
+<div class="mut">The ring is the edge of the lens. Inside it the pattern is compressed (negative lens) or magnified (positive lens); the cylinder stretches it into an ellipse along the axis.</div></section>
+<section class="panel">
+<h2>Lens (made-up prescription)</h2>
+<div class="big" id="rx"></div>
+<label>Sphere S (D) <span id="vS"></span><input id="S" type="range" min="-8" max="8" step="0.25" value="-2.25"></label>
+<label>Cylinder C (D) <span id="vC"></span><input id="C" type="range" min="-4" max="0" step="0.25" value="-1"></label>
+<label>Axis (°) <span id="vA"></span><input id="A" type="range" min="0" max="180" step="5" value="30"></label>
+<label>Base curve F1 (D) <span id="vF1"></span><input id="F1" type="range" min="0" max="10" step="0.5" value="4"></label>
+<label>Index n <span id="vn"></span><input id="n" type="range" min="1.49" max="1.74" step="0.01" value="1.59"></label>
+<label>Centre thickness t (mm) <span id="vt"></span><input id="t" type="range" min="1" max="7" step="0.1" value="2"></label>
+<h2 style="margin-top:14px">Bench</h2>
+<label>L screen–lens (mm) <span id="vL"></span><input id="L" type="range" min="20" max="200" step="5" value="80"></label>
+<label>D camera–screen (mm) <span id="vD"></span><input id="D" type="range" min="250" max="500" step="10" value="350"></label>
+<label>Pattern period in x (screen px) <span id="vP"></span><input id="P" type="range" min="4" max="24" step="1" value="8"></label>
+<label>Period in y (px) — different from x = robust to rotation <span id="vPY"></span><input id="PY" type="range" min="4" max="24" step="1" value="10"></label>
+<label>Phone rotation (°) <span id="vG"></span><input id="G" type="range" min="0" max="360" step="5" value="0"></label>
+<label>Lens tilt (°) — induces cylinder <span id="vI"></span><input id="I" type="range" min="-25" max="25" step="1" value="0"></label>
+<label>Vertical decentring of the lens (mm) <span id="vDY"></span><input id="DY" type="range" min="-10" max="10" step="0.5" value="0"></label>
+<div style="margin-top:8px"><b style="font-size:12px">Animations:</b><br>
+<button id="aL">sweep L</button><button id="aG">rotate 360°</button><button id="aT">hand shake</button><button id="aStop">stop</button></div>
+<div style="margin-top:10px">
+<button data-p="-2.25,-1,30,4,1.59,2">myopia + astig.</button>
+<button data-p="3,-0.5,120,8,1.50,4.5">hyperopia</button>
+<button data-p="-0.5,-0.25,90,3,1.59,2">low prescription</button>
+<button data-p="-6,-2,170,1,1.67,1.5">high myopia</button>
+</div>
+<div class="card" id="sesgo" style="margin-top:12px;border:1px solid var(--bd);border-radius:6px;padding:8px"></div>
+<div class="mut" id="info" style="margin-top:10px"></div>
+</section>
+</main>
+
+<div id="err" class="mut" style="padding:0 16px;color:#c33"></div>
+<script>window.onerror=(m,u,l)=>{document.getElementById("err").textContent+=" ERROR: "+m+" (line "+l+")";};</script>
+<script src="vendor/three.min.js"></script>
+<script src="vendor/OrbitControls.js"></script>
+<script>
+// ------------------------------------------------------------------ parámetros
+const $ = id => document.getElementById(id);
+const PASO = 0.2525;             // mm por píxel de pantalla (HP 15.6" 1366×768) [estimado]
+const PANT = [1366 * PASO, 768 * PASO];
+const DIAM = 50;                  // mm
+function params() {
+  const p = {S:+$('S').value, C:+$('C').value, A:+$('A').value, F1:+$('F1').value,
+             n:+$('n').value, t:+$('t').value, L:+$('L').value, D:+$('D').value, P:+$('P').value,
+             PY:+$('PY').value, G:+$('G').value, I:+$('I').value, DY:+$('DY').value};
+  // superficie posterior por meridiano para dar la BVP pedida (fórmula de lente gruesa)
+  const tn = p.t * 1e-3 / p.n;
+  const fr = p.F1 / (1 - tn * p.F1);
+  p.c1 = p.F1 / (p.n - 1) / 1000;                  // 1/mm
+  p.c2a = (p.S - fr) / (1 - p.n) / 1000;           // meridiano del eje
+  p.c2b = (p.S + p.C - fr) / (1 - p.n) / 1000;     // perpendicular
+  return p;
+}
+function sagF(p, x, y) { const r2 = x*x + y*y; return p.c1*r2 / (1 + Math.sqrt(Math.max(1 - p.c1*p.c1*r2, 1e-9))); }
+function sagB(p, x, y) {
+  const a = p.A * Math.PI / 180, xp = x*Math.cos(a) + y*Math.sin(a), yp = -x*Math.sin(a) + y*Math.cos(a);
+  const A = p.c2a*xp*xp + p.c2b*yp*yp;
+  return A / (1 + Math.sqrt(Math.max(1 - p.c2a*p.c2a*xp*xp - p.c2b*p.c2b*yp*yp, 1e-9)));
+}
+
+// ------------------------------------------------------------------ vista del sensor (WebGL, trazado exacto)
+const camCv = $('cam');
+const gl = camCv.getContext('webgl', {preserveDrawingBuffer: true});
+const VS = `attribute vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
+const FS = `
+precision highp float;
+uniform vec2 res; uniform float fx, D, L, t, n, c1, c2a, c2b, ang, per, pery, R;
+uniform float giro, incl, decy, yaw, pitch;
+float sF(vec2 q, out vec2 g){ q.y -= decy; float r2 = dot(q,q); float s = sqrt(max(1.-c1*c1*r2,1e-9));
+  g = c1*q/s; return c1*r2/(1.+s); }
+float sB(vec2 q, out vec2 g){ q.y -= decy; float ca = cos(ang), sa = sin(ang);
+  vec2 r = vec2(q.x*ca + q.y*sa, -q.x*sa + q.y*ca);
+  float A = c2a*r.x*r.x + c2b*r.y*r.y; float s = sqrt(max(1.-c2a*c2a*r.x*r.x - c2b*c2b*r.y*r.y, 1e-9));
+  float den = (1.+s)*(1.+s);
+  vec2 gr = vec2((2.*c2a*r.x*(1.+s) + A*c2a*c2a*r.x/s)/den, (2.*c2b*r.y*(1.+s) + A*c2b*c2b*r.y/s)/den);
+  g = vec2(gr.x*ca - gr.y*sa, gr.x*sa + gr.y*ca); return A/(1.+s); }
+vec3 refr(vec3 d, vec2 g, float eta, out bool ok){ vec3 N = normalize(vec3(-g, 1.)); float ci = -dot(N,d);
+  if (ci < 0.) { N = -N; ci = -ci; } float k = 1. - eta*eta*(1.-ci*ci); ok = k >= 0.;
+  return normalize(eta*d + (eta*ci - sqrt(max(k,0.)))*N); }
+float patron(vec2 s){ return 0.5 + 0.25*(cos(6.2831853*s.x/per) + cos(6.2831853*s.y/pery)); }
+vec3 rotx(vec3 v, float a){ float c = cos(a), s = sin(a); return vec3(v.x, c*v.y - s*v.z, s*v.y + c*v.z); }
+vec3 roty(vec3 v, float a){ float c = cos(a), s = sin(a); return vec3(c*v.x + s*v.z, v.y, -s*v.x + c*v.z); }
+void main(){
+  vec2 uv = gl_FragCoord.xy - 0.5*res;
+  float cg = cos(giro), sg = sin(giro);
+  vec2 uvr = vec2(cg*uv.x - sg*uv.y, sg*uv.x + cg*uv.y);          // celular girado
+  vec3 o = vec3(0., 0., D);
+  vec3 d = normalize(roty(rotx(vec3(uvr/fx, -1.), pitch), yaw));    // temblor (guiñada/cabeceo)
+  // marco de la lente: giro de inclinación alrededor de x por el centro del vidrio
+  vec3 piv = vec3(0., 0., L + 0.5*t);
+  vec3 ol = rotx(o - piv, -incl) + piv; vec3 dl = rotx(d, -incl);
+  vec2 g; bool ok = true, ok2 = true; float edge = 0.;
+  float zb = L + t; float tau = (zb - ol.z)/dl.z; vec3 P = ol + tau*dl;
+  float val;
+  vec3 Sw = o - (o.z/d.z)*d;                                         // sin lente
+  val = patron(Sw.xy);
+  if (length(P.xy - vec2(0., decy)) < R*1.1) {
+    for (int i=0;i<10;i++){ P = ol + tau*dl; float s = sB(P.xy, g); float gg = P.z - zb - s; float dg = dl.z - dot(g, dl.xy); tau -= gg/dg; }
+    P = ol + tau*dl; sB(P.xy, g);
+    float r1 = length(P.xy - vec2(0., decy));
+    if (r1 < R) {
+      vec3 d1 = refr(dl, g, 1./n, ok); vec3 o1 = P;
+      float tau1 = (L - o1.z)/d1.z;
+      for (int i=0;i<10;i++){ vec3 Q = o1 + tau1*d1; float s = sF(Q.xy, g); float gg = Q.z - L - s; float dg = d1.z - dot(g, d1.xy); tau1 -= gg/dg; }
+      vec3 Q = o1 + tau1*d1; sF(Q.xy, g);
+      vec3 d2 = refr(d1, g, n, ok2);
+      vec3 Qw = rotx(Q - piv, incl) + piv; vec3 d2w = rotx(d2, incl);
+      vec3 S = Qw - (Qw.z/d2w.z)*d2w;
+      val = (ok && ok2 && length(Q.xy - vec2(0., decy)) < R) ? patron(S.xy) : 0.;
+      edge = smoothstep(R-0.8, R, r1);
+    }
+  }
+  val = mix(val, 0.05, edge);
+  gl_FragColor = vec4(vec3(pow(val, 1./1.6)), 1.);
+}`;
+function sh(type, src){ const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { $('err').textContent += ' SHADER: ' + gl.getShaderInfoLog(s); } return s; }
+const prog = gl.createProgram();
+gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FS));
+gl.linkProgram(prog); gl.useProgram(prog);
+const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+const loc = gl.getAttribLocation(prog, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+const U = n => gl.getUniformLocation(prog, n);
+function dibujaCam(p){
+  const w = camCv.clientWidth * devicePixelRatio | 0; camCv.width = w; camCv.height = w;
+  gl.viewport(0, 0, w, w);
+  // misma escala que el recorte de 900 px del gemelo (fx = 2750 px del S22 [estimado])
+  const fx = 2750 * w / 900;
+  gl.uniform2f(U('res'), w, w); gl.uniform1f(U('fx'), fx);
+  gl.uniform1f(U('D'), p.D); gl.uniform1f(U('L'), p.L); gl.uniform1f(U('t'), p.t); gl.uniform1f(U('n'), p.n);
+  gl.uniform1f(U('c1'), p.c1); gl.uniform1f(U('c2a'), p.c2a); gl.uniform1f(U('c2b'), p.c2b);
+  gl.uniform1f(U('ang'), p.A*Math.PI/180); gl.uniform1f(U('per'), p.P*PASO); gl.uniform1f(U('pery'), p.PY*PASO); gl.uniform1f(U('R'), DIAM/2);
+  gl.uniform1f(U('giro'), p.G*Math.PI/180); gl.uniform1f(U('incl'), p.I*Math.PI/180); gl.uniform1f(U('decy'), p.DY);
+  gl.uniform1f(U('yaw'), anim.yaw); gl.uniform1f(U('pitch'), anim.pitch);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+}
+
+// ------------------------------------------------------------------ banco 3D (three.js)
+const v3 = $('v3d');
+const HAY3D = !!(window.THREE && THREE.OrbitControls);
+let renderer, scene, cam3, pantalla, lenteGrp, rayosGrp, camGrp, texPatron, construye3D, redim;
+if (HAY3D) {
+renderer = new THREE.WebGLRenderer({canvas: v3, antialias: true, preserveDrawingBuffer: true});
+scene = new THREE.Scene(); scene.background = new THREE.Color(0x0e0f12);
+cam3 = new THREE.PerspectiveCamera(40, 1, 1, 5000);
+cam3.position.set(420, 260, 520);
+const ctl = new THREE.OrbitControls(cam3, v3); ctl.target.set(0, 0, 175); ctl.update();
+scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+const dl = new THREE.DirectionalLight(0xffffff, 0.8); dl.position.set(300, 400, 600); scene.add(dl);
+// pantalla con el patrón (textura de lienzo)
+texPatron = function(per){ const c = document.createElement('canvas'); c.width = 1366; c.height = 768;
+  const x = c.getContext('2d'), im = x.createImageData(1366, 768);
+  for (let j=0;j<768;j++) for (let i=0;i<1366;i++){ const v = 255*(0.5+0.25*(Math.cos(2*Math.PI*i/per)+Math.cos(2*Math.PI*j/per)));
+    const k = 4*(j*1366+i); im.data[k]=v; im.data[k+1]=v; im.data[k+2]=v; im.data[k+3]=255; }
+  x.putImageData(im, 0, 0); const t = new THREE.CanvasTexture(c); t.minFilter = THREE.LinearFilter; return t; }
+pantalla = new THREE.Mesh(new THREE.PlaneGeometry(PANT[0], PANT[1]), new THREE.MeshBasicMaterial({map: texPatron(8)}));
+scene.add(pantalla);
+const marco = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(PANT[0]+12, PANT[1]+12, 4)), new THREE.LineBasicMaterial({color: 0x666666}));
+marco.position.z = -3; scene.add(marco);
+lenteGrp = new THREE.Group(); scene.add(lenteGrp);
+rayosGrp = new THREE.Group(); scene.add(rayosGrp);
+camGrp = new THREE.Group(); scene.add(camGrp);
+{ // cuerpo del celular y cono de visión
+  const body = new THREE.Mesh(new THREE.BoxGeometry(71, 146, 8), new THREE.MeshStandardMaterial({color: 0x2b2d33, metalness: .3, roughness: .6}));
+  body.position.set(0, 55, 4); camGrp.add(body);
+  const lens = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, 3, 24), new THREE.MeshStandardMaterial({color: 0x111111}));
+  lens.rotation.x = Math.PI/2; lens.position.z = -1.5; camGrp.add(lens);
+}
+function malla(p, cara){ // superficie de la lente (rejilla polar)
+  const nr = 18, nt = 64, R = DIAM/2, pos = [], idx = [];
+  for (let i=0;i<=nr;i++) for (let j=0;j<=nt;j++){ const r = R*i/nr, th = 2*Math.PI*j/nt, x = r*Math.cos(th), y = r*Math.sin(th);
+    const z = cara==='F' ? p.L + sagF(p,x,y) : p.L + p.t + sagB(p,x,y); pos.push(x,y,z); }
+  for (let i=0;i<nr;i++) for (let j=0;j<nt;j++){ const a = i*(nt+1)+j, b = a+nt+1; idx.push(a,b,a+1, b,b+1,a+1); }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos,3)); g.setIndex(idx); g.computeVertexNormals();
+  return g; }
+function trazaRayo(p, x, y){ // mismo trazado exacto que el shader, en JS (para dibujar)
+  const o = [0,0,p.D], Zb = p.D - p.L - p.t; let d = [x, y, -Zb]; let nd = Math.hypot(...d); d = d.map(v=>v/nd);
+  const inter = (o, d, zv, f) => { let tau = (zv - o[2])/d[2];
+    for (let k=0;k<12;k++){ const X = o[0]+tau*d[0], Y = o[1]+tau*d[1], h = 1e-4;
+      const s = f(p,X,Y), sx = (f(p,X+h,Y)-f(p,X-h,Y))/(2*h), sy = (f(p,X,Y+h)-f(p,X,Y-h))/(2*h);
+      tau -= (o[2]+tau*d[2]-zv-s)/(d[2]-sx*d[0]-sy*d[1]); }
+    const X = o[0]+tau*d[0], Y = o[1]+tau*d[1], h = 1e-4;
+    return [[X, Y, zv + f(p,X,Y)], [(f(p,X+h,Y)-f(p,X-h,Y))/(2*h), (f(p,X,Y+h)-f(p,X,Y-h))/(2*h)]]; };
+  const refr = (d, g, eta) => { let N = [-g[0], -g[1], 1]; const nn = Math.hypot(...N); N = N.map(v=>v/nn);
+    let ci = -(N[0]*d[0]+N[1]*d[1]+N[2]*d[2]); if (ci < 0) { N = N.map(v=>-v); ci = -ci; }
+    const k = 1 - eta*eta*(1-ci*ci); const tt = d.map((v,i)=>eta*v + (eta*ci - Math.sqrt(Math.max(k,0)))*N[i]);
+    const m = Math.hypot(...tt); return tt.map(v=>v/m); };
+  const [P1, g1] = inter(o, d, p.L+p.t, sagB); const d1 = refr(d, g1, 1/p.n);
+  const [P2, g2] = inter(P1, d1, p.L, sagF); const d2 = refr(d1, g2, p.n);
+  const P3 = P2.map((v,i)=>v - (P2[2]/d2[2])*d2[i]);
+  return [o, P1, P2, P3]; }
+construye3D = function(p){
+  [lenteGrp, rayosGrp].forEach(g => { while (g.children.length) { const c = g.children.pop(); c.geometry && c.geometry.dispose(); } });
+  const mat = new THREE.MeshPhysicalMaterial({color: 0x9fd3ff, transparent: true, opacity: 0.35, roughness: 0.05, side: THREE.DoubleSide});
+  lenteGrp.add(new THREE.Mesh(malla(p,'F'), mat)); lenteGrp.add(new THREE.Mesh(malla(p,'B'), mat));
+  // canto de la lente
+  const pts = []; for (let j=0;j<=96;j++){ const th = 2*Math.PI*j/96, x = 25*Math.cos(th), y = 25*Math.sin(th);
+    pts.push(new THREE.Vector3(x,y,p.L+sagF(p,x,y)), new THREE.Vector3(x,y,p.L+p.t+sagB(p,x,y))); }
+  lenteGrp.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color: 0x9fd3ff})));
+  const R = 0.85*25, mats = [new THREE.LineBasicMaterial({color: 0xffb347}), new THREE.LineBasicMaterial({color: 0x7ee081})];
+  [0, 90].forEach((ang, k) => { const a = ang*Math.PI/180;
+    for (let i=0;i<9;i++){ const r = -R + 2*R*i/8, x = r*Math.cos(a), y = r*Math.sin(a);
+      const P = trazaRayo(p, x, y).map(q => new THREE.Vector3(...q));
+      rayosGrp.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(P), mats[k])); } });
+  camGrp.position.z = p.D;
+  camGrp.rotation.z = p.G * Math.PI / 180;            // giro del celular
+  lenteGrp.position.y = p.DY; lenteGrp.rotation.x = 0;  // descentrado (la inclinación solo se aplica en la vista del sensor)
+}
+redim = function(){ const w = v3.clientWidth; renderer.setPixelRatio(devicePixelRatio); renderer.setSize(w, w, false); cam3.aspect = 1; cam3.updateProjectionMatrix(); }
+} else { $('v3d').insertAdjacentHTML('afterend','<div class=mut>three.js did not load (vendor/): sensor view only.</div>'); }
+
+// ------------------------------------------------------------------ UI
+const anim = {modo: null, t0: 0, yaw: 0, pitch: 0};
+function paso(ts){
+  if (!anim.modo) return;
+  const t = (ts - anim.t0) / 1000;
+  if (anim.modo === 'L') { $('L').value = Math.round(20 + 140 * (0.5 - 0.5*Math.cos(t*0.9))); }
+  if (anim.modo === 'G') { $('G').value = Math.round((t * 40) % 360 / 5) * 5; }
+  if (anim.modo === 'T') { // temblor fisiológico ~10 Hz, 0.3°, en cámara lenta ×20 para verlo
+    const w = 2*Math.PI*10/20; anim.yaw = 0.3*Math.PI/180*Math.sin(w*t); anim.pitch = 0.3*Math.PI/180*Math.sin(1.13*w*t + 1.3); }
+  actualiza(); requestAnimationFrame(paso);
+}
+function arranca(m){ anim.modo = m; anim.t0 = performance.now(); anim.yaw = 0; anim.pitch = 0; requestAnimationFrame(paso); }
+let perActual = 8;
+function actualiza(){
+  const p = params();
+  $('vS').textContent = p.S.toFixed(2); $('vC').textContent = p.C.toFixed(2); $('vA').textContent = p.A.toFixed(0);
+  $('vF1').textContent = p.F1.toFixed(1); $('vn').textContent = p.n.toFixed(2); $('vt').textContent = p.t.toFixed(1);
+  $('vL').textContent = p.L; $('vD').textContent = p.D; $('vP').textContent = p.P;
+  $('vPY').textContent = p.PY; $('vG').textContent = p.G; $('vI').textContent = p.I; $('vDY').textContent = p.DY;
+  $('rx').textContent = `${p.S>=0?'+':''}${p.S.toFixed(2)} ${p.C.toFixed(2)} × ${p.A.toFixed(0)}°`;
+  // espesor de borde mínimo
+  let emin = 1e9; for (let j=0;j<72;j++){ const th = 2*Math.PI*j/72, x = 25*Math.cos(th), y = 25*Math.sin(th);
+    emin = Math.min(emin, p.t + sagB(p,x,y) - sagF(p,x,y)); }
+  // estimación de lente delgada del eje (la que sesga): J paraxial no se calcula aquí
+  $('info').innerHTML = `Minimum edge thickness: <b>${emin.toFixed(2)} mm</b>${emin<0.5?' <span style="color:var(--ac)">(impossible lens: raise t or lower the curves)</span>':''}<br>
+    F2 (back): ${(p.c2a*1000*(1-p.n)).toFixed(2)} / ${(p.c2b*1000*(1-p.n)).toFixed(2)} D<br>
+    Z camera–lens: ${(p.D - p.L - p.t).toFixed(0)} mm`;
+  // lo que leería una app de lente delgada a esta L (paraxial exacto, ABCD por meridiano)
+  const ABCD = (F1, F2, t, n, Z, L) => { // cámara → posterior → vidrio → frontal → pantalla (metros)
+    const mul = (A, B) => [[A[0][0]*B[0][0]+A[0][1]*B[1][0], A[0][0]*B[0][1]+A[0][1]*B[1][1]], [A[1][0]*B[0][0]+A[1][1]*B[1][0], A[1][0]*B[0][1]+A[1][1]*B[1][1]]];
+    const T = d => [[1, d], [0, 1]], R = F => [[1, 0], [-F, 1]];
+    const M = [T(L), R(F1), T(t/n), R(F2), T(Z)].reduce((a, b) => mul(a, b));
+    return M[0][1] / (Z + t + L); };
+  { const tm = p.t/1000, Lm = p.L/1000, Zm = (p.D - p.L - p.t)/1000, fr = p.F1/(1 - tm/p.n*p.F1);
+    const F2a = p.S - fr, F2b = p.S + p.C - fr;
+    const k = 1/(Lm + tm/2) + 1/(Zm + tm/2);
+    const Pa = (1 - ABCD(p.F1, F2a, tm, p.n, Zm, Lm))*k, Pb = (1 - ABCD(p.F1, F2b, tm, p.n, Zm, Lm))*k;
+    const Sd = Math.max(Pa, Pb), Cd = Math.min(Pa, Pb) - Sd;
+    const col = Math.abs(Sd - p.S) > 0.12 ? 'var(--ac)' : 'inherit';
+    $('sesgo').innerHTML = `<b>A thin-lens app at L = ${p.L} mm</b> would read<br>
+      <span style="font-size:18px;color:${col}">${Sd>=0?'+':''}${Sd.toFixed(2)} ${Cd.toFixed(2)}</span>
+      &nbsp;(error in S: <b style="color:${col}">${(Sd-p.S>=0?'+':'')}${(Sd-p.S).toFixed(2)} D</b>; ISO ±0.12)<br>
+      <span class="mut">The twin's inverse solver uses 3 distances and two surfaces and stays within ±0.12 D in every simulated run.</span>`; }
+  if (HAY3D && p.P !== perActual) { pantalla.material.map.dispose(); pantalla.material.map = texPatron(p.P); perActual = p.P; }
+  dibujaCam(p); if (HAY3D) construye3D(p);
+}
+document.querySelectorAll('input').forEach(i => i.addEventListener('input', actualiza));
+$('aL').onclick = () => arranca('L'); $('aG').onclick = () => arranca('G'); $('aT').onclick = () => arranca('T');
+$('aStop').onclick = () => { anim.modo = null; anim.yaw = 0; anim.pitch = 0; actualiza(); };
+document.querySelectorAll('button[data-p]').forEach(b => b.addEventListener('click', () => {
+  const v = b.dataset.p.split(',').map(Number); ['S','C','A','F1','n','t'].forEach((k,i)=>$(k).value = v[i]); actualiza(); }));
+addEventListener('resize', () => { if (HAY3D) redim(); actualiza(); });
+if (HAY3D) redim(); actualiza();
+if (location.search.includes('test')) setTimeout(() => { const px = new Uint8Array(4*64*64); gl.readPixels(camCv.width/2-32, camCv.height/2-32, 64, 64, gl.RGBA, gl.UNSIGNED_BYTE, px);
+  let m = 0; for (let i=0;i<px.length;i+=4) m += px[i]; m /= 4096;
+  let m3 = -1; if (HAY3D) { renderer.render(scene, cam3); const c2 = document.createElement('canvas'); c2.width = 64; c2.height = 64; c2.getContext('2d').drawImage(v3, 0, 0, 64, 64); const d = c2.getContext('2d').getImageData(0,0,64,64).data; m3 = 0; for (let i=0;i<d.length;i+=4) m3 += d[i]+d[i+1]+d[i+2]; m3 /= 3*4096; }
+  for (const cv of [v3, camCv]) { const im = new Image(); im.src = cv.toDataURL(); im.style.width = '100%'; cv.replaceWith(im); }
+  $('err').textContent += ` TEST sensor media=${m.toFixed(1)} 3D media=${m3.toFixed(1)} HAY3D=${HAY3D}`; }, 50);
+if (HAY3D) (function loop(){ requestAnimationFrame(loop); renderer.render(scene, cam3); })();
+</script>
+</body>
+</html>

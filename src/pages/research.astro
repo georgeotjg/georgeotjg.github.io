@@ -2,7 +2,7 @@
 import Base from "../layouts/Base.astro";
 import PhysicsScenes from "../components/PhysicsScenes.astro";
 import Toc from "../components/Toc.astro";
-import { solver, paper, findings, figuresPaper, figuresSolver, weyl, optics, site } from "../data/site";
+import { solver, paper, findings, figuresPaper, figuresSolver, figuresWeyl, figuresOptics, weyl, optics, site } from "../data/site";
 ---
 
 <Base
@@ -129,6 +129,18 @@ import { solver, paper, findings, figuresPaper, figuresSolver, weyl, optics, sit
       <p>{weyl.summary}</p>
       <p class="meta">{weyl.stack}</p>
       <PhysicsScenes scenes={["weyl"]} />
+      <div class="figs two">
+        {
+          figuresWeyl.map((fig) => (
+            <figure>
+              <a href={fig.src} target="_blank" rel="noopener">
+                <img class="contain" src={fig.src} alt={fig.alt} loading="lazy" />
+              </a>
+              <figcaption>{fig.caption}</figcaption>
+            </figure>
+          ))
+        }
+      </div>
       <h3 style="margin-top:1.6rem">Completed so far</h3>
       <ul class="points">
         {weyl.done.map((d) => <li>{d}</li>)}
@@ -141,6 +153,24 @@ import { solver, paper, findings, figuresPaper, figuresSolver, weyl, optics, sit
       <h2 style="margin-top:0">{optics.title}</h2>
       <p>{optics.summary}</p>
       <PhysicsScenes scenes={["light"]} />
+      <div class="figs two">
+        {
+          figuresOptics.map((fig) => (
+            <figure>
+              <a href={fig.src} target="_blank" rel="noopener">
+                <img class="contain" src={fig.src} alt={fig.alt} loading="lazy" />
+              </a>
+              <figcaption>{fig.caption}</figcaption>
+            </figure>
+          ))
+        }
+        <figure>
+          <a class="cta primary" href="/bench/index.html">Open the interactive virtual bench</a>
+          <figcaption>
+            A free-camera 3D bench with a sensor view: choose a lens prescription, move the lens and the phone, and see what the camera would record. Simulated, design stage; needs WebGL.
+          </figcaption>
+        </figure>
+      </div>
       <h3 style="margin-top:1.6rem">Completed so far</h3>
       <ul class="points">
         {optics.done.map((d) => <li>{d}</li>)}
@@ -149,9 +179,11 @@ import { solver, paper, findings, figuresPaper, figuresSolver, weyl, optics, sit
     </section>
 
     <p class="callout">
-      The animated panels are computed in the browser from analytic models (and
-      from the measured diffraction data, in the case of the crystal); they
-      illustrate the physics and are not output from the research codes.
+      The animated scene panels are computed in the browser from analytic models
+      (and from the measured diffraction data, in the case of the crystal); they
+      illustrate the physics and are not output from the research codes. The
+      TaAs animations and the virtual optical bench show output of the research
+      codes; the bench is a simulation.
     </p>
   </div>
 </Base>
