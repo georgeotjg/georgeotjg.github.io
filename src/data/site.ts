@@ -10,7 +10,7 @@ export const site = {
   short: "Jorge Robles",
   role: "Physicist — experimental materials, superconductivity and optics",
   place: "Colombia · open to remote, hybrid or relocation",
-  degree: "B.Sc. Physics, Universidad Nacional de Colombia — degree conferred 5 November 2026",
+  degree: "Physicist (B.Sc. Physics), Universidad Nacional de Colombia, 2026",
   email: "georgeotjg@gmail.com",
   github: "https://github.com/georgeotjg",
   linkedin: "https://www.linkedin.com/in/jorge-alfredo-robles-calderon/",
@@ -266,7 +266,7 @@ export const cv = {
     { role: "Customer Operations", org: "Iké Asistencia", when: "2023" },
   ],
   education: [
-    { what: "B.Sc. Physics", where: "Universidad Nacional de Colombia, Bogotá", when: "2019 – 2026", note: "Degree conferred 5 November 2026. Bachelor's thesis in experimental materials physics (grade 5.0/5.0). GPA 4.0/5.0." },
+    { what: "B.Sc. Physics", where: "Universidad Nacional de Colombia, Bogotá", when: "2019 – 2026", note: "Bachelor's thesis in experimental materials physics (grade 5.0/5.0). GPA 4.0/5.0." },
     { what: "Technical degree, Administrative Assistance", where: "SENA", when: "2019", note: "" },
   ],
   skills: [
