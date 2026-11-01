@@ -21,7 +21,7 @@ export const site = {
   solverRepo: "https://github.com/georgeotjg/juliaTDGL",
   orcid: "https://orcid.org/0009-0007-0557-0263",
   paperDoi: "https://doi.org/10.5281/zenodo.23163207",
-  updated: "October 2026",
+  updated: "November 2026",
 };
 
 export const intro =
@@ -40,8 +40,8 @@ export const numbers = [
 export const now = [
   "Methods paper on silent failure modes in 3D two-band TDGL simulation, published as a preprint on Zenodo (October 2026), with the open-source solver juliaTDGL.",
   "The geometric diode at MgB₂-like parameters — strong screening and separated coherence lengths — with Joule heating, interband drag and finite interband quasiparticle exchange; release 2.0 of juliaTDGL extends the solver to N bands for three-dimensional nanostructures. Two further manuscripts in preparation.",
-  "Nonlinear optics of Weyl semimetals from first principles: a validated real-time model, and a Quantum ESPRESSO → Wannier90 → Julia chain that reproduces GaAs and TaAs against the literature.",
-  "An open computational lensmeter built from a phone camera and a laptop screen: a virtual optical bench simulates the photographs and the inverse solver recovers the prescription within ±0.12 D (simulation; no real photographs yet).",
+  "Nonlinear optics of Weyl semimetals from first principles: a validated real-time model, and a Quantum ESPRESSO → Wannier90 → Julia chain validated on GaAs, TaAs and LaAlSi.",
+  "An open computational lensmeter built from a phone camera and a laptop screen: a virtual optical bench simulates the photographs and the inverse solver recovers the prescription within ±0.12 D in simulation.",
 ];
 
 export const thesis = {
@@ -60,7 +60,7 @@ export const thesis = {
 
 export const solver = {
   summary:
-    "A three-dimensional, two-band time-dependent Ginzburg–Landau solver for mesoscopic superconductors under applied field and transport current, designed, written and validated independently. Two order parameters coupled by a Josephson term and a self-consistent vector potential on a staggered mesh with gauge-invariant link variables; the current is injected through its own Ampère field, and the voltage is read from the Josephson relation on the gauge-invariant phase. Released as open source, in a two-band release (1.2) and an N-band one (2.0).",
+    "A three-dimensional, two-band time-dependent Ginzburg–Landau solver for mesoscopic superconductors under applied field and transport current, designed, written and validated independently. Two order parameters coupled by a Josephson term and a self-consistent vector potential on a staggered mesh with gauge-invariant link variables; the current is injected through its own Ampère field, and the voltage is read from the Josephson relation on the gauge-invariant phase. Released as open source, in a two-band release (1.2) and an N-band one (2.0); a GPU port reproduces the CPU path to rounding and runs a full time step 4–8 times faster than a laptop core on large meshes.",
   versions: [
     { tag: "v13.3", what: "Octave reference implementation (hash df37e31c), the origin of the stored reference states." },
     { tag: "v14.1", what: "Julia port, bit for bit against v13.3, with an optional scalar potential by Coulomb projection." },
@@ -168,40 +168,37 @@ export const figuresOptics = [
   {
     src: "/figs/bench_distance.gif",
     alt: "Simulated photographs of a crossed fringe pattern seen through a positive spectacle lens as the lens is moved away from the screen",
-    caption: "Virtual optical bench: simulated photographs of the screen pattern through a +3.00 D spectacle lens as the lens–screen distance grows. No real photographs have been analysed yet.",
+    caption: "Virtual optical bench: simulated photographs of the screen pattern through a +3.00 D spectacle lens as the lens–screen distance grows.",
   },
 ];
 
 export const weyl = {
-  status: "Started 2026",
+  status: "2026",
   summary:
-    "How do shift and injection photocurrents and second-harmonic generation in magnetic Weyl semimetals depend on the treatment of the f electrons and on the direction of the magnetization, and where does perturbation theory stop being sufficient? Guiding rule: reproduce the measured linear optical conductivity before trusting any nonlinear prediction.",
-  stack: "Quantum ESPRESSO + Wannier90 + Julia for the dense-k work; Octopus real-time TDDFT as the self-consistent reference; Python for analysis and for separating shift from injection currents in j(t).",
+    "Shift and injection photocurrents and second-harmonic generation in Weyl semimetals, computed from first principles with a stack of my own: Quantum ESPRESSO and Wannier90 for the band structure, Julia for the dense-k response and for real-time propagation in a Wannier basis, and Octopus real-time TDDFT as the self-consistent reference. The tools are validated on a lattice model, GaAs, TaAs and LaAlSi.",
+  stack: "Quantum ESPRESSO + Wannier90 + Julia; Octopus real-time TDDFT; Python for analysis.",
   done: [
     "Analytic Weyl lattice model in real time (Julia): reproduces the quantized circular photogalvanic response of de Juan et al. (2017) without perturbative formulas (Tr β/β₀ = 1.014 on a 96³ grid), and shows the breakdown and Rabi-like rebound of quantization at strong fields.",
-    "Octopus real-time TDDFT validated on silicon, including a symmetry null test: a zero-area pulse leaves no DC current, as inversion requires.",
-    "Quantum ESPRESSO → Wannier90 chain for GaAs running, with band energies reproduced at high-symmetry points — the starting point for the shift-current benchmark.",
     "Interactions in the model: a local mean field barely changes the quantized response, while a non-local exchange term breaks it already at first order.",
-    "Shift current of GaAs reproduced against the literature (plateau 14–16 and peak 37 µA/V² against about 16 and 42), with the overall sign fixed independently by a real-time Wannier propagator that agrees within 1–2 %.",
-    "TaAs as a computational test bed: the 24 Weyl nodes with positions matching Weng et al. (2015) to about 1 %, the break in the slope of the linear optical conductivity near 28 meV as in Xu et al. (2016), and a shift current of about 180 µA/V² at 117 meV against 154 ± 17 µA/V² measured by Osterhoudt et al. (2019).",
-    "Own tools, each checked against an independent calculation: shift current by exact sum over states, real-time propagation in a Wannier basis, and Weyl-node finding with chirality, with adaptive k-meshes.",
+    "Octopus real-time TDDFT validated on silicon, including a symmetry null test: a zero-area pulse leaves no DC current, as inversion requires.",
+    "Shift current of GaAs against the literature (plateau 14–16 and peak 37 µA/V², reference about 16 and 42), with the overall sign fixed independently by a real-time Wannier propagator that agrees within 1–2 %.",
+    "TaAs: the 24 Weyl nodes with positions matching Weng et al. (2015) to about 1 %; Wannier bands within 0.4 meV of the DFT bands near the Fermi level; the break in the slope of the linear optical conductivity near 28 meV as in Xu et al. (2016); and a shift current of about 180 µA/V² at 117 meV against 154 ± 17 µA/V² measured by Osterhoudt et al. (2019).",
+    "LaAlSi: an 80-spinor Wannier model (error 2 × 10⁻⁶ eV) whose optical conductivity peaks at 0.39 eV with a second structure at 0.57 eV, against about 0.4 and 0.65 eV measured by Kimura et al. (2026), and 27 Weyl nodes in three groups as in Su et al. (2021).",
+    "Own tools, each checked against an independent calculation: shift current by exact sum over states, real-time propagation in a Wannier basis, and Weyl-node finding with chirality on adaptive k-meshes.",
   ],
-  next: "A Wannier model of a control compound of the magnetic family, then the f-electron question.",
 };
 
 export const optics = {
-  status: "Design stage",
+  status: "Simulation",
   title: "An open computational lensmeter",
   summary:
-    "A phone camera's RAW sensor and a laptop screen measure spectacle lenses by transmission deflectometry: the camera looks at a pattern on the screen through the lens, and the pattern's distortion gives the lens prescription — sphere, cylinder and axis — with an uncertainty, aiming at the ISO tolerance of ±0.12 D, together with the full power map. The physics and mathematics sit in two pieces: an elliptic inverse problem on a masked domain, solved by conjugate gradients preconditioned with a fast cosine transform, and a thick-lens model fitted at several lens–screen distances.",
+    "A phone camera's RAW sensor and a laptop screen measure spectacle lenses by transmission deflectometry: the camera looks at a pattern on the screen through the lens, and the pattern's distortion gives the lens prescription — sphere, cylinder and axis — with an uncertainty, together with the full power map. The mathematics sits in two pieces: an elliptic inverse problem on a masked domain, solved by conjugate gradients preconditioned with a fast cosine transform, and a thick-lens model fitted at several lens–screen distances.",
   done: [
-    "Simulation: a thin-lens estimate at 5 cm is biased by 0.13–0.34 D on real spectacle lenses; a two-surface model fitted at three distances brings the bias below 0.005 D.",
-    "Core inverse solver checked numerically on a curved domain (error 4 × 10⁻¹¹ in 24 preconditioned iterations).",
-    "A virtual optical bench now simulates the photographs end to end — screen, two-surface lens, a phone camera with sensor noise, quantization and rolling shutter — and passes them to the same inverse solver that will analyse real photographs.",
-    "In simulation, two surfaces fitted at three distances recover sphere, cylinder and axis within the ISO tolerance of ±0.12 D in every case tested, with the phone rotated freely and without a tripod (self-referencing by homography); hand tremor of 0.2° raises the error to about 0.08 D and larger motion triggers an alarm.",
-    "Twenty unit tests check the pieces against known physical and mathematical properties. What is not yet tested: that the phone's RAW data are linear, and the whole method on a real lens — the central, falsifiable prediction of the project.",
+    "A virtual optical bench simulates the photographs end to end — screen, two-surface lens, a phone camera with sensor noise, quantization and rolling shutter — and passes them to the inverse solver.",
+    "A thin-lens estimate at 5 cm is biased by 0.13–0.34 D on real spectacle lenses; a two-surface model fitted at three distances recovers sphere, cylinder and axis within the ISO tolerance of ±0.12 D in every simulated case, with the phone at any angle and without a tripod (self-referencing by homography).",
+    "Robustness studied in simulation: hand tremor, ambient light, dispersion, stacked lenses, tinted, prismatic and polarized lenses, with alarms for the cases the method cannot handle.",
+    "Core inverse solver checked numerically on a curved domain (error 4 × 10⁻¹¹ in 24 preconditioned iterations); twenty unit tests for the pieces.",
   ],
-  next: "Characterize the phone sensor and the screen, then measure a few spectacle lenses against an optician's lensmeter.",
 };
 
 export const software = [

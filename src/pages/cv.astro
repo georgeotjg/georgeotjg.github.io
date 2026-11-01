@@ -54,7 +54,7 @@ import { site, cv, thesis } from "../data/site";
             link variables, self-consistent vector potential, self-field current
             injection, Josephson voltmeter. Bit for bit against its Octave
             reference; ~56 000 test assertions. Open source as
-            <a href={site.solverRepo}>juliaTDGL</a> (MIT; two-band release 1.2, N-band release 2.0;
+            <a href={site.solverRepo}>juliaTDGL</a> (MIT; two-band release 1.2, N-band release 2.0, GPU port 4–8× faster on large meshes;
             <a href="https://georgeotjg.github.io/juliaTDGL/">documentation</a>).
           </p>
           <p>
@@ -77,12 +77,12 @@ import { site, cv, thesis } from "../data/site";
           </p>
         </div>
         <div class="cv-item">
-          <strong>Nonlinear optics of Weyl semimetals (started 2026)</strong>
-          <p>First-principles photocurrents and second-harmonic generation: Octopus real-time TDDFT and Quantum ESPRESSO + Wannier90 + Julia. Installation validated against the Octopus test suite; real-time lattice model reproducing the quantized circular photogalvanic response; symmetry null test on silicon; GaAs shift current and TaAs (24 Weyl nodes, shift current) reproduced against the literature with own Julia tools.</p>
+          <strong>Nonlinear optics of Weyl semimetals (2026)</strong>
+          <p>First-principles photocurrents and second-harmonic generation: Octopus real-time TDDFT and Quantum ESPRESSO + Wannier90 + Julia. Installation validated against the Octopus test suite; real-time lattice model reproducing the quantized circular photogalvanic response; symmetry null test on silicon; GaAs, TaAs and LaAlSi reproduced against the literature with own Julia tools (shift current, 24 Weyl nodes, optical conductivity).</p>
         </div>
         <div class="cv-item">
-          <strong>Computational lensmeter (design stage)</strong>
-          <p>Spectacle-lens measurement (sphere, cylinder, axis) by transmission deflectometry with a phone camera's RAW sensor and a laptop screen. A virtual optical bench simulates the photographs end to end and feeds the same inverse solver; in simulation the prescription is recovered within ±0.12 D (no real photographs yet).</p>
+          <strong>Computational lensmeter</strong>
+          <p>Spectacle-lens measurement (sphere, cylinder, axis) by transmission deflectometry with a phone camera's RAW sensor and a laptop screen. A virtual optical bench simulates the photographs end to end and feeds the same inverse solver; in simulation the prescription is recovered within ±0.12 D.</p>
         </div>
       </div>
     </section>

@@ -23,8 +23,8 @@ import { solver, paper, findings, figuresPaper, figuresSolver, figuresWeyl, figu
     <p class="kicker">Research</p>
     <h1>Superconductivity, light and matter</h1>
     <p class="lede">
-      Simulation of two-band superconductors, the main line of work, and two
-      projects started in 2026: first-principles nonlinear optics of Weyl
+      Simulation of multiband superconductors, the main line of work, and two
+      projects of 2026: first-principles nonlinear optics of Weyl
       semimetals and an open computational lensmeter.
     </p>
     <p class="meta">
@@ -141,11 +141,10 @@ import { solver, paper, findings, figuresPaper, figuresSolver, figuresWeyl, figu
           ))
         }
       </div>
-      <h3 style="margin-top:1.6rem">Completed so far</h3>
+      <h3 style="margin-top:1.6rem">Results</h3>
       <ul class="points">
         {weyl.done.map((d) => <li>{d}</li>)}
       </ul>
-      <p><strong>Next:</strong> {weyl.next}</p>
     </section>
 
     <section id="optics">
@@ -167,23 +166,21 @@ import { solver, paper, findings, figuresPaper, figuresSolver, figuresWeyl, figu
         <figure>
           <a class="cta primary" href="/bench/index.html">Open the interactive virtual bench</a>
           <figcaption>
-            A free-camera 3D bench with a sensor view: choose a lens prescription, move the lens and the phone, and see what the camera would record. Simulated, design stage; needs WebGL.
+            A free-camera 3D bench with a sensor view: choose a lens prescription, move the lens and the phone, and see what the camera would record. Simulated; needs WebGL.
           </figcaption>
         </figure>
       </div>
-      <h3 style="margin-top:1.6rem">Completed so far</h3>
+      <h3 style="margin-top:1.6rem">Results</h3>
       <ul class="points">
         {optics.done.map((d) => <li>{d}</li>)}
       </ul>
-      <p><strong>Next:</strong> {optics.next}</p>
     </section>
 
     <p class="callout">
       The animated scene panels are computed in the browser from analytic models
-      (and from the measured diffraction data, in the case of the crystal); they
-      illustrate the physics and are not output from the research codes. The
+      (and from the measured diffraction data, in the case of the crystal). The
       TaAs animations and the virtual optical bench show output of the research
-      codes; the bench is a simulation.
+      codes.
     </p>
   </div>
 </Base>
